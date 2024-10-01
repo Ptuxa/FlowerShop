@@ -1,4 +1,4 @@
 # FlowerShop title
 
-Server is made in Node.js
-Client is made in Express
+Server is made in Express
+Client is made in React
