@@ -1,54 +1,62 @@
 "use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
-const cors_1 = __importDefault(require("cors"));
 const multer_1 = __importDefault(require("multer"));
+const mongoose_1 = __importDefault(require("mongoose"));
+const fs_1 = __importDefault(require("fs"));
+const path_1 = __importDefault(require("path"));
 const app = (0, express_1.default)();
-const PORT = process.env.PORT || 5000;
-app.use((0, cors_1.default)());
-app.use(express_1.default.json());
-// Настройка multer для загрузки файлов
 const upload = (0, multer_1.default)({ dest: 'uploads/' });
-// Список задач (вместо базы данных используем в памяти)
-let tasks = [];
-// Получить все задачи
-app.get('/api/tasks', (req, res) => {
+// Подключение к базе данных
+mongoose_1.default.connect('mongodb://localhost:27017/flower_shop');
+// Модель для хранения задач с картинками в базе данных
+const taskSchema = new mongoose_1.default.Schema({
+    title: String,
+    status: String,
+    dueDate: Date,
+    image: String
+});
+const Task = mongoose_1.default.model('flowers', taskSchema);
+app.use(express_1.default.json());
+// Загрузка файла и сохранение изображения в формате base64 в базу данных
+app.post('/api/tasks', upload.single('image'), (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    if (!req.file) {
+        res.status(400).send('No file uploaded');
+    }
+    else {
+        // Чтение файла и конвертация в base64
+        const imageFile = fs_1.default.readFileSync(path_1.default.join(__dirname, req.file.path));
+        const imageBase64 = imageFile.toString('base64');
+        // Создание новой задачи с картинкой
+        const newTask = new Task({
+            title: req.body.title,
+            status: 'incomplete',
+            dueDate: req.body.dueDate,
+            image: imageBase64
+        });
+        yield newTask.save();
+        // Возвращаем сохраненную задачу
+        res.status(201).json(newTask);
+    }
+}));
+// Получение всех задач с изображениями
+app.get('/api/tasks', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const tasks = yield Task.find();
     res.json(tasks);
-});
-// Создать новую задачу
-app.post('/api/tasks', (req, res) => {
-    const task = Object.assign(Object.assign({}, req.body), { id: Date.now(), status: 'incomplete' });
-    tasks.push(task);
-    res.status(201).json(task);
-});
-// Загрузить файл для задачи
-app.post('/api/tasks/:id/upload', upload.single('file'), (req, res) => {
-    var _a;
-    const task = tasks.find(t => t.id === parseInt(req.params.id));
-    if (!task) {
-        return res.status(404).send('Task not found');
-    }
-    task.file = (_a = req.file) === null || _a === void 0 ? void 0 : _a.path;
-    res.json(task);
-});
-// Обновить статус задачи
-app.put('/api/tasks/:id', (req, res) => {
-    const task = tasks.find(t => t.id === parseInt(req.params.id));
-    if (!task) {
-        return res.status(404).send('Task not found');
-    }
-    task.status = req.body.status;
-    task.dueDate = req.body.dueDate;
-    res.json(task);
-});
-// Удалить задачу
-app.delete('/api/tasks/:id', (req, res) => {
-    tasks = tasks.filter(t => t.id !== parseInt(req.params.id));
-    res.status(204).send();
-});
+}));
+const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
-    console.log(`Server running on http://localhost:${PORT}`);
+    console.log(`Server is running on port ${PORT}`);
 });

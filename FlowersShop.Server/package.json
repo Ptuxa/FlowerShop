@@ -3,10 +3,9 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "start": "node dist/index.js",
-    "build": "tsc",
-    "dev": "ts-node src/index.ts",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "ts-node src/index.ts",
+    "dev": "nodemon --watch \"src/**/*\" --exec ts-node src/index.ts",
+    "debug": "node --inspect -r ts-node/register src/index.ts"
   },
   "keywords": [],
   "author": "",
@@ -15,13 +14,16 @@
   "dependencies": {
     "cors": "^2.8.5",
     "express": "^4.21.0",
+    "mongoose": "^8.7.0",
     "multer": "^1.4.5-lts.1"
   },
   "devDependencies": {
     "@types/cors": "^2.8.17",
     "@types/express": "^5.0.0",
+    "@types/mongoose": "^5.11.97",
     "@types/multer": "^1.4.12",
     "@types/node": "^22.7.4",
+    "nodemon": "^3.1.7",
     "ts-node": "^10.9.2",
     "typescript": "^5.6.2"
   }

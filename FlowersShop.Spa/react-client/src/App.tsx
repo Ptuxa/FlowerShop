@@ -1,61 +1,92 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
 interface Task {
-    id: number;
+    id: string;
     title: string;
     status: string;
     dueDate?: string;
-    file?: string;
+    image?: string; // поле для хранения base64
 }
 
-const App: React.FC = () => {
+const TaskUploader: React.FC = () => {
     const [tasks, setTasks] = useState<Task[]>([]);
-    const [newTask, setNewTask] = useState<string>('');
+    const [taskTitle, setTaskTitle] = useState('');
+    const [file, setFile] = useState<File | null>(null);
+    const [dueDate, setDueDate] = useState('');
 
     useEffect(() => {
         fetchTasks();
     }, []);
 
+    // Получение всех задач
     const fetchTasks = async () => {
         const response = await axios.get('/api/tasks');
         setTasks(response.data);
     };
 
-    const createTask = async () => {
-        if (newTask) {
-            await axios.post('/api/tasks', { title: newTask });
-            fetchTasks();
-            setNewTask('');
+    // Обработка загрузки файла
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files) {
+            setFile(e.target.files[0]);
         }
     };
-    
-    const updateTaskStatus = async (id: number, status: string) => {
-        await axios.put(`/api/tasks/${id}`, { status });
-        fetchTasks(); 
-    };
 
-    const deleteTask = async (id: number) => {
-        await axios.delete(`api/tasks/${id}`);
-        fetchTasks(); 
-    }    
+    // Обработка формы создания задачи
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        const formData = new FormData();
+        formData.append('title', taskTitle);
+        formData.append('dueDate', dueDate);
+        if (file) {
+            formData.append('image', file);
+        }
+
+        try {
+            await axios.post('/api/tasks', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            });
+            fetchTasks(); // обновляем список задач
+        } catch (error) {
+            console.error('Error uploading task:', error);
+        }
+    };
 
     return (
         <div>
-            <h1>Task List</h1>
-            <input
-                type="text"
-                value={newTask}
-                onChange={(e) => setNewTask(e.target.value)}
-                placeholder="Enter new task"
-            />
-            <button onClick={createTask}>Add Task</button>
+            <h2>Create Task</h2>
+            <form onSubmit={handleSubmit}>
+                <input
+                    type="text"
+                    value={taskTitle}
+                    onChange={(e) => setTaskTitle(e.target.value)}
+                    placeholder="Task title"
+                />
+                <input
+                    type="date"
+                    value={dueDate}
+                    onChange={(e) => setDueDate(e.target.value)}
+                />
+                <input type="file" onChange={handleFileChange} />
+                <button type="submit">Create Task</button>
+            </form>
+
+            <h2>Task List</h2>
             <ul>
                 {tasks.map(task => (
                     <li key={task.id}>
-                        {task.title} - {task.status}
-                        <button onClick={() => updateTaskStatus(task.id, 'complete')}>Complete</button>
-                        <button onClick={() => deleteTask(task.id)}>Delete</button>
+                        <h3>{task.title}</h3>
+                        <p>Status: {task.status}</p>
+                        {task.dueDate && <p>Due Date: {task.dueDate}</p>}
+                        {task.image && (
+                            <img
+                                src={`data:image/jpeg;base64,${task.image}`}
+                                alt="Task image"
+                                style={{ width: '200px', height: 'auto' }}
+                            />
+                        )}
                     </li>
                 ))}
             </ul>
@@ -63,4 +94,4 @@ const App: React.FC = () => {
     );
 };
 
-export default App;
+export default TaskUploader;
