@@ -6,7 +6,7 @@ interface Task {
     title: string;
     status: string;
     dueDate?: string;
-    image?: string; // поле для хранения base64
+    image?: string; 
 }
 
 const TaskUploader: React.FC = () => {
@@ -19,7 +19,6 @@ const TaskUploader: React.FC = () => {
         fetchTasks();
     }, []);
 
-    // Получение всех задач
     const fetchTasks = async () => {
         const response = await axios.get('/api/tasks');
         setTasks(response.data);
