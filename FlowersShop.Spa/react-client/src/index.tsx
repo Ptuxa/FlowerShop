@@ -9,12 +9,12 @@ const rootElement = document.getElementById('root');
 
 // Проверяем, существует ли rootElement
 if (rootElement) {
-  const root = ReactDOM.createRoot(rootElement as HTMLElement);
-  root.render(
-    <React.StrictMode>
-      <App />
-    </React.StrictMode>
-  );
+    const root = ReactDOM.createRoot(rootElement as HTMLElement);
+    root.render(
+        <React.StrictMode>
+            <App />
+        </React.StrictMode>
+    );
 }
 
 // Если вы хотите начать измерять производительность приложения, используйте reportWebVitals
