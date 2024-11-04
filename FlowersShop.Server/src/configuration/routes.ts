@@ -1,25 +1,12 @@
 import express from 'express';
-import UserController from '../controller/userController';
-import CategoryController from '../controller/categoryController';
-import ProductController from '../controller/productController';
+import userRoute from './routes/userRoute';
+import categoryRoute from './routes/categoryRoute';
+import productRoute from './routes/productRoute';
 
 const router = express.Router();
 
-// // Пользователи
-// router.post('/users', UserController.createUser);
-// router.get('/users', UserController.getUsers);
-// router.put('/users/:id', UserController.updateUser);
-
-// // Категории
-// router.post('/categories', CategoryController.createCategory);
-// router.get('/categories', CategoryController.getCategories);
-
-// // Продукты
-// router.post('/products', ProductController.createProduct);
-// router.get('/products', ProductController.getProducts);
-
-// // Токены (Redis)
-// router.post('/tokens/refresh', TokenController.addRefreshToken);
-// router.get('/tokens/access/:user_id', TokenController.getAccessToken);
+// router.use(userRoute);
+router.use('/category', categoryRoute);
+// router.use(productRoute);
 
 export default router;
