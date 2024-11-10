@@ -2,13 +2,50 @@ import express, { Request, Response } from "express";
 import multer from "multer";
 import mongoose, { Model } from "mongoose";
 import { v4 as uuid } from "uuid";
-import routes from './configuration/routes';
+// import routes from './configuration/routes';
+import CategoryController from "./controller/categoryController";
+import ProductController from "./controller/productController";
+import ImageController from "./controller/imageController";
+import { CategoryMapper } from "./service/mapper/categoryMapper";
+import { ProductMapper } from "./service/mapper/productMapper";
+import { ImageMapper } from "./service/mapper/imageMapper";
+import { CategoryRepository } from "./repository/categoryRepository";
+import { ProductRepository } from "./repository/productRepository";
+import { ImageRepository } from "./repository/imageRepository";
+import { ImageService } from "./service/impl/imageService";
+import { CategoryService } from "./service/impl/categoryService";
+import { ProductService } from "./service/impl/productService";
+import CategoryRouter from "./configuration/routes/categoryRoute";
+import ProductRouter from "./configuration/routes/productRoute";
+import ImageRouter from "./configuration/routes/imageRoute";
 
 const PORT = process.env.PORT || 5000;
 
+const categoryMapper = new CategoryMapper();
+const productMapper = new ProductMapper();
+const imageMapper = new ImageMapper();
+
+const categoryRepository = new CategoryRepository();
+const productRepository = new ProductRepository();
+const imageRepository = new ImageRepository();
+
+const categoryService = new CategoryService(categoryRepository, productRepository, categoryMapper);
+const productService = new ProductService(productRepository, productMapper);
+const imageService = new ImageService(imageRepository, imageMapper);
+
+const categoryController = new CategoryController(categoryService);
+const productController = new ProductController(productService);
+const imageController = new ImageController(imageService);
+
+const categoryRouter = new CategoryRouter(categoryController);
+const productRouter = new ProductRouter(productController);
+const imageRouter = new ImageRouter(imageController);
+
 const app = express();
 app.use(express.json());
-app.use('/api', routes);
+app.use('/api/category', categoryRouter.initRoutes());
+app.use('/api/product', productRouter.initRoutes());
+app.use('/api/image', imageRouter.initRoutes());
 
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
