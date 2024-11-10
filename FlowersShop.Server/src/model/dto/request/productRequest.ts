@@ -1,7 +1,7 @@
 export interface ProductRequest {
-    categoryId: string;
+    categoryId: string | null;
     name: string;
     amount: number;
     price: number;
-    picturePath: string
+    imageId: string | null;
 }

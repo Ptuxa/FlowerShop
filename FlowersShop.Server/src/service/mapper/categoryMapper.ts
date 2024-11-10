@@ -4,10 +4,6 @@ import { Category } from "../../model/entity/category";
 import { v4 as uuid } from "uuid";
 
 export class CategoryMapper {
-    constructor() {
-        
-    }
-
     public toCategory(categoryRequest: CategoryRequest): Category {
         return {
             id: uuid(), 

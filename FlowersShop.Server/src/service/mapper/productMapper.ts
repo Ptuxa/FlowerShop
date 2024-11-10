@@ -4,29 +4,40 @@ import { Product } from "../../model/entity/product";
 import { v4 as uuid } from "uuid";
 
 export class ProductMapper {
-    public static toProduct(productRequest: ProductRequest): Product {
+    public toProduct(productRequest: ProductRequest): Product {
         return {            
             id: uuid(), 
             categoryId: productRequest.categoryId,
             name: productRequest.name,
             amount: productRequest.amount,            
             price: productRequest.price,            
-            picturePath: productRequest.picturePath,            
+            imageId: productRequest.imageId
         };
     }
 
-    public static toProductResponse(product: Product): ProductResponse {
+    public toProductResponse(product: Product): ProductResponse {
         return {
             id: product.id,
             categoryId: product.categoryId,
             name: product.name,
             amount: product.amount,            
             price: product.price,            
-            picturePath: product.picturePath,
+            imageId: product.imageId,
         };
     }
 
-    public static toProductResponseList(categories: Product[]): ProductResponse[] {
+    public toProductResponseList(categories: Product[]): ProductResponse[] {
         return categories.map((product) => this.toProductResponse(product));
+    }
+
+    public partialUpdate(productRequest: ProductRequest, product: Product): ProductResponse {
+        return {
+            id: product.id,
+            categoryId: productRequest.categoryId,
+            name: productRequest.name,
+            amount: productRequest.amount,
+            price: productRequest.price,
+            imageId: productRequest.imageId
+        }
     }
 }

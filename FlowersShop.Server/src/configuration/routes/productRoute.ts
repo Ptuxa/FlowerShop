@@ -1,10 +1,27 @@
-import express from 'express'
-import productController from '../../controller/productController';
+import express, { Router } from 'express'
+import ProductController from '../../controller/productController';
 
-const router = express.Router();
+class ProductRouter {
+    private readonly productController;
+    private readonly router;
 
-// Продукты
-// router.post('/products', productController.createProduct);
-// router.get('/products', productController.getProducts);
+    constructor(
+        productController: ProductController,
+    ) {
+        this.productController = productController;
 
-export default router;
+        this.router = express.Router();
+    }
+
+    public initRoutes() : Router{
+        this.router.get("/:id", this.productController.getProductById);
+        this.router.get("/", this.productController.getAllProducts);
+        this.router.post("/", this.productController.createProduct);
+        this.router.put("/:id", this.productController.updateProduct);
+        this.router.delete("/:id", this.productController.deleteProduct);
+
+        return this.router;
+    }
+}
+
+export default ProductRouter;

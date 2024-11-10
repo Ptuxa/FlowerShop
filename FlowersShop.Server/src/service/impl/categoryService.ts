@@ -2,14 +2,17 @@ import { CategoryRequest } from "../../model/dto/request/categoryRequest";
 import { CategoryResponse } from "../../model/dto/response/categoryResponse";
 import { Category } from "../../model/entity/category";
 import { CategoryRepository } from "../../repository/categoryRepository";
+import { ProductRepository } from "../../repository/productRepository";
 import { CategoryMapper } from "../mapper/categoryMapper";
 
 export class CategoryService {
-    private categoryRepository: CategoryRepository;
-    private categoryMapper: CategoryMapper;
+    private readonly categoryRepository: CategoryRepository;
+    private readonly productRepository: ProductRepository;
+    private readonly categoryMapper: CategoryMapper;
 
-    constructor(categoryRepository: CategoryRepository, categoryMapper: CategoryMapper) {
+    constructor(categoryRepository: CategoryRepository, productRepository: ProductRepository, categoryMapper: CategoryMapper) {
         this.categoryRepository = categoryRepository;
+        this.productRepository = productRepository;
         this.categoryMapper = categoryMapper;
     }
     
@@ -69,5 +72,7 @@ export class CategoryService {
         } catch (error) {
             throw new Error("Error in CategoryService deleteCategory: " + error);
         }
+
+        await this.productRepository.updateCategoryByCategoryId(id, null)
     }
 }

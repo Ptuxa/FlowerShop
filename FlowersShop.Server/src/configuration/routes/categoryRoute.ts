@@ -1,17 +1,24 @@
-import express from 'express';
-import { CategoryService } from '../../service/impl/categoryService';
-import { CategoryRepository } from '../../repository/categoryRepository';
-import { CategoryMapper } from '../../service/mapper/categoryMapper';
-import CategoryController from '../../controller/categoryController';
+import express, { Router } from "express";
+import CategoryController from "../../controller/categoryController";
 
-const router = express.Router();
-const categoryService = new CategoryService(new CategoryRepository(), new CategoryMapper());
-const categoryController = new CategoryController(categoryService);
+class CategoryRouter {
+    private readonly categoryController;
+    private readonly router;
 
-router.get('/:id', categoryController.getCategoryById);
-router.get('/', categoryController.getAllCategories);
-router.post('/', categoryController.createCategory);
-router.put('/:id', categoryController.updateCategory);
-router.delete('/:id', categoryController.deleteCategory);
+    constructor(categoryController: CategoryController) {
+        this.categoryController = categoryController;
+        this.router = express.Router();
+    }
 
-export default router;
+    public initRoutes(): Router {
+        this.router.get("/:id", this.categoryController.getCategoryById);
+        this.router.get("/", this.categoryController.getAllCategories);
+        this.router.post("/", this.categoryController.createCategory);
+        this.router.put("/:id", this.categoryController.updateCategory);
+        this.router.delete("/:id", this.categoryController.deleteCategory);
+
+        return this.router;
+    }
+}
+
+export default CategoryRouter;
