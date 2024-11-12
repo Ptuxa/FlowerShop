@@ -3,13 +3,16 @@ import { ImageRepository } from "../../repository/imageRepository";
 import { ImageMapper } from "../mapper/imageMapper";
 import { Image } from "../../model/entity/image";
 import { ImageRequest } from "../../model/dto/request/imageRequest";
+import { ProductRepository } from "../../repository/productRepository";
 
 export class ImageService {
     private imageRepository: ImageRepository;
+    private productRepository: ProductRepository;
     private imageMapper: ImageMapper;
 
-    constructor(imageRepository: ImageRepository, imageMapper: ImageMapper) {
+    constructor(imageRepository: ImageRepository, productRepository: ProductRepository, imageMapper: ImageMapper) {
         this.imageRepository = imageRepository;
+        this.productRepository = productRepository;
         this.imageMapper = imageMapper;
     }
 
@@ -64,6 +67,8 @@ export class ImageService {
     }
 
     public async deleteImage(id: string): Promise<void> {
+        await this.productRepository.updateImagesIdByImageId(id, null)
+
         try {
             await this.imageRepository.deleteById(id);
         } catch (error) {

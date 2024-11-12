@@ -15,8 +15,10 @@ try {
         connectionLimit: 10,
         queueLimit: 0
     });
+
+    console.log("Connection to MySql has been successful.");
 } catch(error) {
-    throw new Error(`Create pool exception: ${error}`);
+    throw new Error(`Create pool MySql exception: ${error}`);
 }
 
 export default pool;

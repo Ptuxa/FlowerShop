@@ -1,5 +1,6 @@
 export interface RefreshToken {
-    user_id: string;
+    id: string;
     value: string;
-    expiryDate: Date;
+    expirationTimestamp: number;
+    userId: string;
 }
