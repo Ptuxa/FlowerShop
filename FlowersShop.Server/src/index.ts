@@ -18,39 +18,57 @@ import { ProductService } from "./service/impl/productService";
 import CategoryRouter from "./configuration/routes/categoryRoute";
 import ProductRouter from "./configuration/routes/productRoute";
 import ImageRouter from "./configuration/routes/imageRoute";
+import AuthenticationRouter from "./configuration/routes/authenticationRoute";
+import AuthenticationController from "./controller/authenticationController";
+import { AuthenticationService } from "./service/impl/authenticationService";
+import { AccessTokenRepository } from "./repository/accessTokenRepository";
+import { RefreshTokenRepository } from "./repository/refreshTokenRepository";
+import { UserRepository } from "./repository/userRepository";
+import { SignInMapper } from "./service/mapper/signInMapper";
+import { SignUpMapper } from "./service/mapper/signUpMapper";
 
 const PORT = process.env.PORT || 5000;
 
 const categoryMapper = new CategoryMapper();
 const productMapper = new ProductMapper();
 const imageMapper = new ImageMapper();
+const signInMapper = new SignInMapper();
+const signUpMapper = new SignUpMapper();
 
 const categoryRepository = new CategoryRepository();
 const productRepository = new ProductRepository();
 const imageRepository = new ImageRepository();
+const userRepository = new UserRepository();
+const accessTokenRepository = new AccessTokenRepository();
+const refreshTokenRepository = new RefreshTokenRepository();
 
 const categoryService = new CategoryService(categoryRepository, productRepository, categoryMapper);
 const productService = new ProductService(productRepository, productMapper);
-const imageService = new ImageService(imageRepository, imageMapper);
+const imageService = new ImageService(imageRepository, productRepository, imageMapper);
+const authenticationService = new AuthenticationService(userRepository, accessTokenRepository, refreshTokenRepository, signInMapper, signUpMapper);
 
 const categoryController = new CategoryController(categoryService);
 const productController = new ProductController(productService);
 const imageController = new ImageController(imageService);
+const authenticationController = new AuthenticationController(authenticationService);
 
 const categoryRouter = new CategoryRouter(categoryController);
 const productRouter = new ProductRouter(productController);
 const imageRouter = new ImageRouter(imageController);
+const authenticationRouter = new AuthenticationRouter(authenticationController);
 
 const app = express();
 app.use(express.json());
 app.use('/api/category', categoryRouter.initRoutes());
 app.use('/api/product', productRouter.initRoutes());
 app.use('/api/image', imageRouter.initRoutes());
+app.use('/api/auth', authenticationRouter.initRoutes());
 
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 });
 
+// TODO Add routes for authentication
 
 // const storage = multer.memoryStorage();
 // const upload = multer({ storage });

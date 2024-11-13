@@ -58,6 +58,31 @@ export class RefreshTokenRepository {
         return Promise.resolve(refreshToken);
     }
 
+    public async getRefreshTokenByUserId(userId: string): Promise<RefreshToken> {
+        let rows: RowDataPacket[];
+        try {
+            [rows] = await db.query<RowDataPacket[]>(
+                "SELECT `id`, `value`, `expiration_timestamp`, `user_id` FROM `refreshTokens` WHERE `user_id` = ?",
+                [userId]
+            );
+        } catch (error) {
+            throw new Error("Get refreshToken by user id error: " + error);
+        }
+
+        if (rows.length === 0) {
+            throw new Error("RefreshToken not found");
+        }
+
+        const refreshToken: RefreshToken = {
+            id: rows[0].id,
+            value: rows[0].value,
+            expirationTimestamp: rows[0].expiration_timestamp,
+            userId: rows[0].user_id,
+        };
+
+        return Promise.resolve(refreshToken);
+    }
+
     public async getRefreshTokenByValue(value: string): Promise<RefreshToken> {
         let rows: RowDataPacket[];
         try {
