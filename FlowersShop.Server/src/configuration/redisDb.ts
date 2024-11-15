@@ -35,7 +35,6 @@ export class RedisClientAsync extends Redis {
 const pool = new RedisClientAsync({
     host: process.env.REDIS_HOST || "localhost",
     port: Number(process.env.REDIS_PORT || "6379"), 
-    password: process.env.REDIS_PASSWORD || undefined, 
     db: Number(process.env.REDIS_DB || "0"), 
     maxRetriesPerRequest: 1,
     retryStrategy: (times) => Math.min(times * 50, 2000),
@@ -46,7 +45,7 @@ pool.on("connect", () => {
 });
 
 pool.on("error", (err) => {
-    console.error("Failed to connect to Redis pool: ", err);
+    throw new Error("Failed to connect to Redis pool: " + err);
 });
 
 export default pool;

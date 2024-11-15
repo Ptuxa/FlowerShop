@@ -5,7 +5,7 @@ import { RefreshToken } from "../model/entity/refreshToken";
 export class RefreshTokenRepository {
     private async create(refreshToken: RefreshToken): Promise<RefreshToken> {
         try {
-            await db.query("INSERT INTO refreshTokens (id, value, expiration_timestamp, user_id) VALUES (?, ?, ?, ?)", [
+            await db.query("INSERT INTO refresh_tokens (id, value, expiration_timestamp, user_id) VALUES (?, ?, ?, ?)", [
                 refreshToken.id,
                 refreshToken.value,
                 refreshToken.expirationTimestamp,
@@ -18,9 +18,9 @@ export class RefreshTokenRepository {
         return Promise.resolve(refreshToken);
     }
 
-    private async update(refreshToken: RefreshToken): Promise<RefreshToken> {
+    private async updateById(refreshToken: RefreshToken): Promise<RefreshToken> {
         try {
-            await db.query(`UPDATE refreshTokens SET value = ?, expiration_timestamp = ?, user_id = ? WHERE id = ?`, [
+            await db.query(`UPDATE refresh_tokens SET value = ?, expiration_timestamp = ?, user_id = ? WHERE id = ?`, [
                 refreshToken.value,
                 refreshToken.expirationTimestamp,
                 refreshToken.userId,
@@ -33,11 +33,26 @@ export class RefreshTokenRepository {
         return Promise.resolve(refreshToken);
     }
 
+    private async updateByUserId(refreshToken: RefreshToken): Promise<RefreshToken> {
+        try {
+            await db.query(`UPDATE refresh_tokens SET id = ?, value = ?, expiration_timestamp = ? WHERE user_id = ?`, [
+                refreshToken.id,
+                refreshToken.value,
+                refreshToken.expirationTimestamp,
+                refreshToken.userId
+            ]);
+        } catch (error) {
+            throw new Error("Update refreshToken error: " + error);
+        }
+
+        return Promise.resolve(refreshToken);
+    }
+
     public async getRefreshTokenById(id: string): Promise<RefreshToken> {
         let rows: RowDataPacket[];
         try {
             [rows] = await db.query<RowDataPacket[]>(
-                "SELECT `id`, `value`, `expiration_timestamp`, `user_id` FROM `refreshTokens` WHERE `id` = ?",
+                "SELECT `id`, `value`, `expiration_timestamp`, `user_id` FROM `refresh_tokens` WHERE `id` = ?",
                 [id]
             );
         } catch (error) {
@@ -62,7 +77,7 @@ export class RefreshTokenRepository {
         let rows: RowDataPacket[];
         try {
             [rows] = await db.query<RowDataPacket[]>(
-                "SELECT `id`, `value`, `expiration_timestamp`, `user_id` FROM `refreshTokens` WHERE `user_id` = ?",
+                "SELECT `id`, `value`, `expiration_timestamp`, `user_id` FROM `refresh_tokens` WHERE `user_id` = ?",
                 [userId]
             );
         } catch (error) {
@@ -87,7 +102,7 @@ export class RefreshTokenRepository {
         let rows: RowDataPacket[];
         try {
             [rows] = await db.query<RowDataPacket[]>(
-                "SELECT `id`, `value`, `expiration_timestamp`, `user_id` FROM `refreshTokens` WHERE `value` = ?",
+                "SELECT `id`, `value`, `expiration_timestamp`, `user_id` FROM `refresh_tokens` WHERE `value` = ?",
                 [value]
             );
         } catch (error) {
@@ -112,7 +127,7 @@ export class RefreshTokenRepository {
         let rows: RowDataPacket[];
 
         try {
-            [rows] = await db.query<RowDataPacket[]>("SELECT * FROM `refreshTokens`");
+            [rows] = await db.query<RowDataPacket[]>("SELECT * FROM `refresh_tokens`");
         } catch (error) {
             throw new Error("Get all refreshToken error: " + error);
         }
@@ -127,7 +142,7 @@ export class RefreshTokenRepository {
         return Promise.resolve(refreshTokens);
     }
 
-    public async save(refreshToken: RefreshToken): Promise<RefreshToken> {
+    public async saveById(refreshToken: RefreshToken): Promise<RefreshToken> {
         let isExistRefreshToken: Boolean = true;
 
         try {
@@ -138,7 +153,27 @@ export class RefreshTokenRepository {
 
         try {
             if (isExistRefreshToken) {
-                return Promise.resolve(await this.update(refreshToken));
+                return Promise.resolve(await this.updateById(refreshToken));
+            }
+
+            return Promise.resolve(await this.create(refreshToken));
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    public async saveByUserId(refreshToken: RefreshToken): Promise<RefreshToken> {
+        let isExistRefreshToken: Boolean = true;
+
+        try {
+            await this.getRefreshTokenByUserId(refreshToken.userId);
+        } catch (error) {
+            isExistRefreshToken = false;
+        }
+
+        try {
+            if (isExistRefreshToken) {
+                return Promise.resolve(await this.updateByUserId(refreshToken));
             }
 
             return Promise.resolve(await this.create(refreshToken));
@@ -155,7 +190,7 @@ export class RefreshTokenRepository {
         }
 
         try {
-            await db.query("DELETE FROM refreshTokens WHERE id = ?", id);
+            await db.query("DELETE FROM refresh_tokens WHERE id = ?", id);
         } catch (error) {
             throw new Error("Delete refreshToken error: " + error);
         }
@@ -163,7 +198,7 @@ export class RefreshTokenRepository {
 
     public async deleteByUserId(userId: string): Promise<void> {
         try {
-            await db.query("DELETE FROM refreshTokens WHERE user_id = ?", userId);
+            await db.query("DELETE FROM refresh_tokens WHERE user_id = ?", userId);
         } catch (error) {
             throw new Error("Delete refreshToken error: " + error);
         }

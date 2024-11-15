@@ -34,7 +34,7 @@ export class AuthMiddleware {
             return;
         }
 
-        const accessTokenValue = authHeader?.substring(this.HEADER_AUTH_START_NAME.length);
+        let accessTokenValue = authHeader?.substring(this.HEADER_AUTH_START_NAME.length);
 
         if (accessTokenValue === undefined) {
             throw Error("Error: accessTokenValue cannot be undefined");
@@ -51,13 +51,26 @@ export class AuthMiddleware {
 
         req.authentication = {
             userId: (decodedAccessToken as jwt.JwtPayload).userId,
+            expirationTimestamp: (decodedAccessToken as jwt.JwtPayload).expirationTimestamp
         };
 
         try {
-            await this.accessTokenRepository.getAccessTokenByUserId(req.authentication.userId);
+            accessTokenValue = await this.accessTokenRepository.getAccessTokenValueByUserId(req.authentication.userId);
         } catch (err) {
             res.status(403).json({ message: `Invalid access token ${err}` });
             return;
+        }
+
+        try {
+            decodedAccessToken = verifyAccessToken(accessTokenValue);
+        } catch (err) {
+            res.status(403).json({ message: `Invalid access token ${err}` });
+            return;
+        }
+
+        if ((decodedAccessToken as jwt.JwtPayload).expirationTimestamp !== req.authentication.expirationTimestamp) {
+            res.status(403).json({ message: `Invalid access token` });     
+            return;       
         }
 
         let refreshToken: RefreshToken | null;

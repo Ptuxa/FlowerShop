@@ -12,8 +12,14 @@ import {
     generateAccessTokenValue,
     generateRefreshTokenValue,
     hashPassword,
+    verifyAccessToken,
 } from "../utils/authenticationFunctions";
 import { RefreshToken} from "../../model/entity/refreshToken"
+import { UpdateAccessTokenRequest } from "../../model/dto/request/updateAccessTokenRequest";
+import { UpdateAccessTokenMapper } from "../mapper/updateAccessTokenMapper";
+import { UpdateAccessTokenResponse } from "../../model/dto/response/updateAccessTokenResponse";
+import { AccessToken } from "../../model/entity/accessToken";
+import jwt from "jsonwebtoken";
 
 export class AuthenticationService {
     private readonly userRepository: UserRepository;
@@ -21,19 +27,22 @@ export class AuthenticationService {
     private readonly refreshTokenRepository: RefreshTokenRepository;
     private readonly signInMapper: SignInMapper;
     private readonly signUpMapper: SignUpMapper;
+    private readonly updateAccessTokenMapper: UpdateAccessTokenMapper;
 
     constructor(
         userRepository: UserRepository,
         accessTokenRepository: AccessTokenRepository,
         refreshTokenRepository: RefreshTokenRepository,
         signInMapper: SignInMapper,
-        signUpMapper: SignUpMapper
+        signUpMapper: SignUpMapper,
+        updateAccessTokenMapper: UpdateAccessTokenMapper
     ) {
         this.userRepository = userRepository;
         this.accessTokenRepository = accessTokenRepository;
         this.refreshTokenRepository = refreshTokenRepository;
         this.signInMapper = signInMapper;
         this.signUpMapper = signUpMapper;
+        this.updateAccessTokenMapper = updateAccessTokenMapper;
     }
 
     public async signInUser(signInRequest: SignInRequest): Promise<SignInResponse> {
@@ -66,7 +75,7 @@ export class AuthenticationService {
         const expirationRefreshTokenTimestamp = currentTimestamp + Number(process.env.REFRESH_TOKEN_EXPIRES_IN);
 
         try {
-            await this.refreshTokenRepository.save(
+            await this.refreshTokenRepository.saveByUserId(
                 this.signInMapper.toRefreshToken(refreshTokenValue, expirationRefreshTokenTimestamp, user.id)
             );
         } catch (error) {
@@ -79,11 +88,11 @@ export class AuthenticationService {
     public async signUpUser(signUpRequest: SignUpRequest): Promise<void> {
         const passwordHash = await hashPassword(signUpRequest.password);
 
-        let isExistEmail: boolean = false;
+        let isExistEmail: boolean = true;
         try {
             await this.userRepository.getUserByEmail(signUpRequest.email);
         } catch (error) {
-            isExistEmail = true;
+            isExistEmail = false;            
         }
 
         if (!isExistEmail) {
@@ -93,9 +102,38 @@ export class AuthenticationService {
                 throw new Error("Error in AuthenticationService signUpUser: " + error);
             }
         }
+        else {
+            throw new Error("User with the same email exists");
+        }
     }
 
-    public async logoutUser(userId: string): Promise<void> {
+    public async logoutUser(userId: string | undefined, expirationTimestamp: number | undefined): Promise<void> {
+        if (userId === undefined) {
+            throw Error("Undefined userId when user logout");
+        }
+
+        if (expirationTimestamp === undefined) {
+            throw Error("Undefined expirationTimestamp when user logout");
+        }
+
+        let accessTokenValue: string | null;
+        try {
+            accessTokenValue = await this.accessTokenRepository.getAccessTokenValueByUserId(userId);
+        } catch (error) {
+            throw Error("Error in AuthenticationService updateAccessToken: " + error);
+        }
+
+        let decodedAccessToken: string | jwt.JwtPayload = "";
+        try {
+            decodedAccessToken = verifyAccessToken(accessTokenValue);
+        } catch (err) {
+            throw Error("Access token from database is invalid.")
+        }
+
+        if ((decodedAccessToken as jwt.JwtPayload).expirationTimestamp !== expirationTimestamp) {
+            throw Error("Access token is invalid");
+        }
+
         try {
             await this.accessTokenRepository.deleteByUserId(userId);
         } catch (error) {
@@ -109,12 +147,12 @@ export class AuthenticationService {
         }
     }
 
-    public async updateAccessToken(refreshTokenValue: string): Promise<string> {
+    public async updateAccessToken(refreshTokenValue: UpdateAccessTokenRequest): Promise<UpdateAccessTokenResponse> {
         let refreshToken: RefreshToken | null;
         let user: User | null;
 
         try {
-            refreshToken = await this.refreshTokenRepository.getRefreshTokenByValue(refreshTokenValue);
+            refreshToken = await this.refreshTokenRepository.getRefreshTokenByValue(refreshTokenValue.refreshTokenValue);
         } catch (error) {
             throw Error("Error in AuthenticationService updateAccessToken: " + error);
         }
@@ -142,6 +180,6 @@ export class AuthenticationService {
             throw new Error("Error in AuthenticationService signInUser: " + error);
         }
 
-        return accessTokenValue;
+        return this.updateAccessTokenMapper.toUpdateAccessTokenResponse(accessTokenValue);
     }
 }

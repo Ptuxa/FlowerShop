@@ -3,6 +3,8 @@ import { AuthenticationService } from '../service/impl/authenticationService';
 import { SignInRequest } from '../model/dto/request/signInRequest';
 import { SignInResponse } from '../model/dto/response/signInResponse';
 import { SignUpRequest } from '../model/dto/request/signUpRequest';
+import { UpdateAccessTokenRequest } from '../model/dto/request/updateAccessTokenRequest';
+import { UpdateAccessTokenResponse } from '../model/dto/response/updateAccessTokenResponse';
 
 class AuthenticationController {
     private readonly authenticationService: AuthenticationService;
@@ -26,7 +28,7 @@ class AuthenticationController {
         const signUpRequest: SignUpRequest = req.body;
 
         try {
-            await this.authenticationService.signInUser(signUpRequest);
+            await this.authenticationService.signUpUser(signUpRequest);
             res.status(200).send();
         } catch (error) {
             res.status(400).json({ message: `Error sign up: ${(error as Error).message}` });
@@ -34,14 +36,12 @@ class AuthenticationController {
     }
 
     public logoutUser = async (req: Request, res: Response): Promise<void> => {
+        // const userId = (req as Request & { authentication: { userId: string } }).authentication?.userId;
         const userId = req.authentication?.userId;
-
-        if (userId === undefined) {
-            throw Error("Undefined userId when user logout");
-        }
+        const expirationTimestamp = req.authentication?.expirationTimestamp;
 
         try {
-            await this.authenticationService.logoutUser(userId);
+            await this.authenticationService.logoutUser(userId, expirationTimestamp);
             res.status(200).send();
         } catch (error) {
             res.status(400).json({ message: `Error logout user: ${(error as Error).message}` });
@@ -49,11 +49,11 @@ class AuthenticationController {
     }
 
     public updateAccessToken = async (req: Request, res: Response): Promise<void> => {
-        const refreshTokenValue: string = req.body;
+        const updateAccessTokenRequest: UpdateAccessTokenRequest = req.body;
         
         try {
-            const accessTokenValue: string = await this.authenticationService.updateAccessToken(refreshTokenValue);
-            res.status(200).json(accessTokenValue);
+            const updateAccessTokenResponse: UpdateAccessTokenResponse = await this.authenticationService.updateAccessToken(updateAccessTokenRequest);
+            res.status(200).json(updateAccessTokenResponse);
         } catch (error) {
             res.status(400).json({ message: `Error update access token: ${(error as Error).message}` });
         }

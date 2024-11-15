@@ -2,7 +2,7 @@ import pool from "../configuration/redisDb";
 import { AccessToken } from "../model/entity/accessToken";
 
 export class AccessTokenRepository {
-    private readonly keyPrefix = "accessToken:";
+    private readonly keyPrefix = "accessToken";
     private readonly keyPostfix = "";
 
 
@@ -24,12 +24,10 @@ export class AccessTokenRepository {
         return accessToken;
     }
 
-    public async getAccessTokenByUserId(userId: string): Promise<AccessToken> {
-        const key = this.createKey(userId);
-        let value: string | null | undefined;                
+    public async getAccessTokenValueByUserId(userId: string): Promise<string> {
+        const key = this.createKey(userId);        
                         
-        const expiryTime = await pool.ttlAsync(key);
-        const expirationTimestamp = Math.floor(Date.now() / 1000);
+        const expiryTime = await pool.ttlAsync(key);        
 
         if (expiryTime === -1) {
             throw Error(`Error: access token with id=${userId} haven't expiry time preset`);            
@@ -37,6 +35,7 @@ export class AccessTokenRepository {
             throw Error(`Error: access token with id=${userId} doesn't exist`);                        
         }
 
+        let value: string | null | undefined;       
         try {            
             value = await pool.getAsync(key);                                  
         } catch (error) {            
@@ -46,14 +45,8 @@ export class AccessTokenRepository {
         if (value === null || value === undefined) {
             throw Error(`Error: access token with id=${userId} haven't any data`);    
         }
-        
-        const accessToken: AccessToken = {
-            userId: userId,
-            value: value,
-            expirationTimestamp: expirationTimestamp
-        }
 
-        return accessToken;
+        return value;
     }
 
     public async deleteByUserId(userId: string): Promise<void> {

@@ -4,7 +4,7 @@ import { User } from "../../model/entity/user";
 import { v4 as uuid } from "uuid";
 
 export class UserMapper {
-    public static toUser(userRequest: UserRequest): User {
+    public toUser(userRequest: UserRequest): User {
         return {
             id: uuid(),
             email: userRequest.email,
@@ -13,7 +13,7 @@ export class UserMapper {
         };
     }
 
-    public static toUserResponse(user: User): UserResponse {
+    public toUserResponse(user: User): UserResponse {
         return {
             id: uuid(),
             email: user.email,
@@ -22,7 +22,7 @@ export class UserMapper {
         };
     }
 
-    public static toUserResponseList(categories: User[]): UserResponse[] {
+    public toUserResponseList(categories: User[]): UserResponse[] {
         return categories.map((user) => this.toUserResponse(user));
     }
 }

@@ -22,10 +22,10 @@ export class SignInMapper {
         };
     }
 
-    public toSignInResponse(accessToken: string, refreshToken: string): SignInResponse {
+    public toSignInResponse(accessTokenValue: string, refreshTokenValue: string): SignInResponse {
         return {
-            accessToken: accessToken,
-            refreshToken: refreshToken,
+            accessTokenValue: accessTokenValue,
+            refreshTokenValue: refreshTokenValue,
         };
     }
 }
