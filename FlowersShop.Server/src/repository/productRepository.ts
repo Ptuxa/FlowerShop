@@ -29,11 +29,22 @@ export class ProductRepository {
         return Promise.resolve(product);
     }
 
-    public async updateCategoryByCategoryId(categoryIdOld: string, categoryIdNew: string | null): Promise<void> {
+    public async updateCategoriesIdByCategoryId(categoryIdOld: string, categoryIdNew: string | null): Promise<void> {
         try {
             await db.query(
                 `UPDATE products SET category_id = ? WHERE category_id = ?`,
                 [categoryIdNew, categoryIdOld]
+            );
+        } catch (error) {
+            throw new Error("Update product error: " + error);
+        }
+    }
+
+    public async updateImagesIdByImageId(imageIdOld: string, imageIdNew: string | null): Promise<void> {
+        try {
+            await db.query(
+                `UPDATE products SET image_id = ? WHERE image_id = ?`,
+                [imageIdNew, imageIdOld]
             );
         } catch (error) {
             throw new Error("Update product error: " + error);

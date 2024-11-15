@@ -1,0 +1,63 @@
+import { Request, Response } from 'express';
+import { AuthenticationService } from '../service/impl/authenticationService';
+import { SignInRequest } from '../model/dto/request/signInRequest';
+import { SignInResponse } from '../model/dto/response/signInResponse';
+import { SignUpRequest } from '../model/dto/request/signUpRequest';
+import { UpdateAccessTokenRequest } from '../model/dto/request/updateAccessTokenRequest';
+import { UpdateAccessTokenResponse } from '../model/dto/response/updateAccessTokenResponse';
+
+class AuthenticationController {
+    private readonly authenticationService: AuthenticationService;
+
+    constructor(authenticationService: AuthenticationService) {
+        this.authenticationService = authenticationService;
+    }
+
+    public signInUser = async (req: Request, res: Response): Promise<void> => {
+        const signInRequest: SignInRequest = req.body;
+
+        try {
+            const signInResponse: SignInResponse = await this.authenticationService.signInUser(signInRequest);
+            res.status(200).json(signInResponse);
+        } catch (error) {
+            res.status(400).json({ message: `Error sign in: ${(error as Error).message}` });
+        }
+    }
+
+    public signUpUser = async (req: Request, res: Response): Promise<void> => {
+        const signUpRequest: SignUpRequest = req.body;
+
+        try {
+            await this.authenticationService.signUpUser(signUpRequest);
+            res.status(200).send();
+        } catch (error) {
+            res.status(400).json({ message: `Error sign up: ${(error as Error).message}` });
+        }
+    }
+
+    public logoutUser = async (req: Request, res: Response): Promise<void> => {
+        // const userId = (req as Request & { authentication: { userId: string } }).authentication?.userId;
+        const userId = req.authentication?.userId;
+        const expirationTimestamp = req.authentication?.expirationTimestamp;
+
+        try {
+            await this.authenticationService.logoutUser(userId, expirationTimestamp);
+            res.status(200).send();
+        } catch (error) {
+            res.status(400).json({ message: `Error logout user: ${(error as Error).message}` });
+        }
+    }
+
+    public updateAccessToken = async (req: Request, res: Response): Promise<void> => {
+        const updateAccessTokenRequest: UpdateAccessTokenRequest = req.body;
+        
+        try {
+            const updateAccessTokenResponse: UpdateAccessTokenResponse = await this.authenticationService.updateAccessToken(updateAccessTokenRequest);
+            res.status(200).json(updateAccessTokenResponse);
+        } catch (error) {
+            res.status(400).json({ message: `Error update access token: ${(error as Error).message}` });
+        }
+    }
+}
+
+export default AuthenticationController;

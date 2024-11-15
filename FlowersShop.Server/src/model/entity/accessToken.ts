@@ -1,5 +1,5 @@
 export interface AccessToken {
-    user_id: string;
+    userId: string;
     value: string;
-    expiryDate: Date;
+    expirationTimestamp: number;
 }
