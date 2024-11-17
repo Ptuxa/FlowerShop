@@ -91,7 +91,7 @@ export class AuthMiddleware {
         }        
     };
 
-    public authorize = (requiredRole: string) => {
+    public authorize = (requiredRoles: string[]) => {
         return async (req: Request, res: Response, next: NextFunction): Promise<void> => {
             const userId = req.authentication?.userId;
 
@@ -108,7 +108,7 @@ export class AuthMiddleware {
                 return;
             }
 
-            if (user.role !== requiredRole.toString()) {
+            if (!requiredRoles.includes(user.role.toString())) {
                 res.status(403).json({ message: "Access denied" });
                 return;
             }

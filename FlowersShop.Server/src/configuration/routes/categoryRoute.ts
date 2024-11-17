@@ -22,25 +22,25 @@ class CategoryRouter {
         this.router.get(
             "/",
             this.authMiddleware.authenticate,
-            this.authMiddleware.authorize(EnumUserRole.USER),
+            this.authMiddleware.authorize([EnumUserRole.USER, EnumUserRole.ADMIN]),
             this.categoryController.getAllCategories
         );
         this.router.post(
             "/",
             this.authMiddleware.authenticate,
-            this.authMiddleware.authorize(EnumUserRole.ADMIN),
+            this.authMiddleware.authorize([EnumUserRole.ADMIN]),
             this.categoryController.createCategory
         );
         this.router.put(
             "/:id",
             this.authMiddleware.authenticate,
-            this.authMiddleware.authorize(EnumUserRole.ADMIN),
+            this.authMiddleware.authorize([EnumUserRole.ADMIN]),
             this.categoryController.updateCategory
         );
         this.router.delete(
             "/:id",
             this.authMiddleware.authenticate,
-            this.authMiddleware.authorize(EnumUserRole.ADMIN),
+            this.authMiddleware.authorize([EnumUserRole.ADMIN]),
             this.categoryController.deleteCategory
         );
 
