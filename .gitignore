@@ -1,4 +1,5 @@
 FlowersShop.Server/.env
 FlowersShop.Server/dist
 FlowersShop.Server/node_modules
+FlowersShop.Server/uploads/images
 .vscode

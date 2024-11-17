@@ -1,4 +1,3 @@
-import { SignInRequest } from "../../model/dto/request/signInRequest";
 import { SignInResponse } from "../../model/dto/response/signInResponse";
 import { AccessToken } from "../../model/entity/accessToken";
 import { RefreshToken } from "../../model/entity/refreshToken";

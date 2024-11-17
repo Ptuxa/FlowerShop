@@ -4,5 +4,5 @@ export interface ProductResponse {
     name: string;
     amount: number;
     price: number;
-    imageId: string | null
+    imageName: string | null
 }

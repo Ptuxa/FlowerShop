@@ -11,7 +11,7 @@ export class ProductMapper {
             name: productRequest.name,
             amount: productRequest.amount,            
             price: productRequest.price,            
-            imageId: productRequest.imageId
+            imageName: productRequest.imageName
         };
     }
 
@@ -22,7 +22,7 @@ export class ProductMapper {
             name: product.name,
             amount: product.amount,            
             price: product.price,            
-            imageId: product.imageId,
+            imageName: product.imageName,
         };
     }
 
@@ -37,7 +37,7 @@ export class ProductMapper {
             name: productRequest.name,
             amount: productRequest.amount,
             price: productRequest.price,
-            imageId: productRequest.imageId
+            imageName: productRequest.imageName
         }
     }
 }

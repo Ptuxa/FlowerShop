@@ -1,78 +1,61 @@
-import { ImageResponse } from "../../model/dto/response/imageResponse";
-import { ImageRepository } from "../../repository/imageRepository";
 import { ImageMapper } from "../mapper/imageMapper";
-import { Image } from "../../model/entity/image";
-import { ImageRequest } from "../../model/dto/request/imageRequest";
-import { ProductRepository } from "../../repository/productRepository";
+import fs from "fs";
+import { LoadImageResponse } from "../../model/dto/response/loadImageResponse";
+import path from "path";
 
 export class ImageService {
-    private imageRepository: ImageRepository;
-    private productRepository: ProductRepository;
-    private imageMapper: ImageMapper;
+    private readonly imageMapper: ImageMapper;
+    private readonly imageFolderPath: string;
 
-    constructor(imageRepository: ImageRepository, productRepository: ProductRepository, imageMapper: ImageMapper) {
-        this.imageRepository = imageRepository;
-        this.productRepository = productRepository;
+    constructor(imageMapper: ImageMapper, imageFolderPath: string) {
         this.imageMapper = imageMapper;
+        this.imageFolderPath = imageFolderPath;
     }
 
-    public async getImageById(id: string): Promise<ImageResponse> {
-        let image: Image | null;
-
-        try {
-            image = await this.imageRepository.getImageById(id);
-        } catch (error) {
-            throw new Error("Error in ImageService getImageById: " + error);
+    public async loadImage(file: Express.Multer.File | undefined): Promise<LoadImageResponse> {
+        if (!file) {
+            throw new Error("File is undefined");
         }
 
-        return this.imageMapper.toImageResponse(image);
+        return this.imageMapper.toLoadImageResponse(file);
     }
 
-    public async getAllImages(): Promise<ImageResponse[]> {
-        let images: Image[] | null;
+    public async deleteImage(filename: string): Promise<void> {
+        const filePath = path.join(this.imageFolderPath, filename);
+            
+        await new Promise<void>((resolve, reject) => {
+            fs.access(filePath, fs.constants.F_OK, (err) => {
+                if (err) {
+                    return reject(new Error(`File not found: ${filename}`));
+                }
+                resolve();
+            });
+        });
 
-        try {
-            images = await this.imageRepository.getAll();
-        } catch (error) {
-            throw new Error("Error in ImageService getAllCategories: " + error);
-        }
-
-        return this.imageMapper.toImageResponseList(images);
+        
+        await new Promise<void>((resolve, reject) => {
+            fs.unlink(filePath, (err) => {
+                if (err) {
+                    return reject(new Error(`Failed to delete file: ${filename}`));
+                }
+                resolve();
+            });
+        });       
     }
 
-    public async createImage(imageRequest: ImageRequest): Promise<ImageResponse> {
-        let image: Image | null;
-
-        try {
-            image = await this.imageRepository.save(this.imageMapper.toImage(imageRequest));
-        } catch (error) {
-            throw new Error("Error in ImageService saveImage: " + error);
+    public async getImageByFileName(fileName: string): Promise<string> {
+        if (!fileName) {
+            throw new Error("Filename is unndefined");            
         }
 
-        return this.imageMapper.toImageResponse(image);
-    }
+        const filePath = path.join(this.imageFolderPath, fileName);
+        
+        fs.access(filePath, fs.constants.F_OK, (err) => {
+            if (err) {
+                throw new Error("File not found");   
+            }
+        });
 
-    public async updateImage(id: string, imageRequest: ImageRequest): Promise<ImageResponse> {
-        let image: Image | null;
-
-        try {
-            image = await this.imageRepository.save(
-                this.imageMapper.partialUpdate(imageRequest, await this.imageRepository.getImageById(id))
-            );
-        } catch (error) {
-            throw new Error("Error in ImageService saveImage: " + error);
-        }
-
-        return this.imageMapper.toImageResponse(image);
-    }
-
-    public async deleteImage(id: string): Promise<void> {
-        await this.productRepository.updateImagesIdByImageId(id, null)
-
-        try {
-            await this.imageRepository.deleteById(id);
-        } catch (error) {
-            throw new Error("Error in ImageService deleteImage: " + error);
-        }
+        return filePath;
     }
 }
