@@ -3,5 +3,5 @@ export interface ProductRequest {
     name: string;
     amount: number;
     price: number;
-    imageId: string | null;
+    imageName: string | null;
 }

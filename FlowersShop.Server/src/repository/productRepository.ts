@@ -6,8 +6,8 @@ export class ProductRepository {
     private async create(product: Product): Promise<Product> {
         try {
             await db.query(
-                "INSERT INTO products (id, category_id, name, amount, price, image_id) VALUES (?, ?, ?, ?, ?, ?)",
-                [product.id, product.categoryId, product.name, product.amount, product.price, product.imageId]
+                "INSERT INTO products (id, category_id, name, amount, price, image_name) VALUES (?, ?, ?, ?, ?, ?)",
+                [product.id, product.categoryId, product.name, product.amount, product.price, product.imageName]
             );
         } catch (error) {
             throw new Error("Save product error: " + error);
@@ -19,8 +19,8 @@ export class ProductRepository {
     private async update(product: Product): Promise<Product> {
         try {
             await db.query(
-                `UPDATE products SET category_id = ?, name = ?, amount = ?, price = ?, image_id = ? WHERE id = ?`,
-                [product.categoryId, product.name, product.amount, product.price, product.imageId, product.id]
+                `UPDATE products SET category_id = ?, name = ?, amount = ?, price = ?, image_name = ? WHERE id = ?`,
+                [product.categoryId, product.name, product.amount, product.price, product.imageName, product.id]
             );
         } catch (error) {
             throw new Error("Update product error: " + error);
@@ -40,22 +40,11 @@ export class ProductRepository {
         }
     }
 
-    public async updateImagesIdByImageId(imageIdOld: string, imageIdNew: string | null): Promise<void> {
-        try {
-            await db.query(
-                `UPDATE products SET image_id = ? WHERE image_id = ?`,
-                [imageIdNew, imageIdOld]
-            );
-        } catch (error) {
-            throw new Error("Update product error: " + error);
-        }
-    }
-
     public async getProductById(id: string): Promise<Product> {
         let rows: RowDataPacket[];
         try {
             [rows] = await db.query<RowDataPacket[]>(
-                "SELECT `id`, `category_id`, `name`, `amount`, `price`, `image_id` FROM `products` WHERE `id` = ?",
+                "SELECT `id`, `category_id`, `name`, `amount`, `price`, `image_name` FROM `products` WHERE `id` = ?",
                 [id]
             );
         } catch (error) {
@@ -72,7 +61,7 @@ export class ProductRepository {
             name: rows[0].name,
             amount: rows[0].amount,
             price: rows[0].price,
-            imageId: rows[0].imageId,
+            imageName: rows[0].image_name,
         };
 
         return Promise.resolve(product);
@@ -93,7 +82,7 @@ export class ProductRepository {
             name: row.name,
             amount: row.amount,
             price: row.price,
-            imageId: row.image_id,
+            imageName: row.image_name,
         }));
 
         return Promise.resolve(products);
