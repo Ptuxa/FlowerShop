@@ -27,19 +27,19 @@ class ProductRouter {
         this.router.post(
             "/",
             this.authMiddleware.authenticate,
-            this.authMiddleware.authorize(EnumUserRole.ADMIN),
+            this.authMiddleware.authorize([EnumUserRole.ADMIN]),
             this.productController.createProduct
         );
         this.router.put(
             "/:id",
             this.authMiddleware.authenticate,
-            this.authMiddleware.authorize(EnumUserRole.ADMIN),
+            this.authMiddleware.authorize([EnumUserRole.ADMIN]),
             this.productController.updateProduct
         );
         this.router.delete(
             "/:id",
             this.authMiddleware.authenticate,
-            this.authMiddleware.authorize(EnumUserRole.ADMIN),
+            this.authMiddleware.authorize([EnumUserRole.ADMIN]),
             this.productController.deleteProduct
         );
 

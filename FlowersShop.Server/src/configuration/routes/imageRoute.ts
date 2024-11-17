@@ -22,7 +22,7 @@ class ImageRouter {
         this.router.post(
             "/",
             this.authMiddleware.authenticate,
-            this.authMiddleware.authorize(EnumUserRole.ADMIN),
+            this.authMiddleware.authorize([EnumUserRole.ADMIN]),
             this.imageMiddleware.getMiddleware().single("image"),
             this.imageController.loadImage
         );
@@ -30,7 +30,7 @@ class ImageRouter {
         this.router.delete(
             "/:filename",
             this.authMiddleware.authenticate,
-            this.authMiddleware.authorize(EnumUserRole.ADMIN),            
+            this.authMiddleware.authorize([EnumUserRole.ADMIN]),            
             this.imageController.deleteImage
         );
 
