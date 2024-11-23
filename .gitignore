@@ -1,5 +1,43 @@
-FlowersShop.Server/.env
-FlowersShop.Server/dist
-FlowersShop.Server/node_modules
-FlowersShop.Server/uploads/images
-.vscode
+/FlowersShop.Server/.env
+/FlowersShop.Server/dist
+/FlowersShop.Server/node_modules
+/FlowersShop.Server/uploads/images
+/.vscode
+
+/FlowersShop.Spa/react-client/node_modules
+/FlowersShop.Spa/react-client/.pnp
+/FlowersShop.Spa/react-client/coverage
+/FlowersShop.Spa/react-client/.next/
+/FlowersShop.Spa/react-client/out/
+/FlowersShop.Spa/react-client/build
+# /FlowersShop.Spa/react-client/.pnp.*
+# /FlowersShop.Spa/react-client/.yarn/*
+# /FlowersShop.Spa/react-client/!.yarn/patches
+# /FlowersShop.Spa/react-client/!.yarn/plugins
+# /FlowersShop.Spa/react-client/!.yarn/releases
+# /FlowersShop.Spa/react-client/!.yarn/versions
+# /FlowersShop.Spa/react-client/
+# /FlowersShop.Spa/react-client/# testing
+# /FlowersShop.Spa/react-client/
+# /FlowersShop.Spa/react-client/# next.js
+# /FlowersShop.Spa/react-client/
+# /FlowersShop.Spa/react-client/# production
+# /FlowersShop.Spa/react-client/
+# /FlowersShop.Spa/react-client/# misc
+# /FlowersShop.Spa/react-client/.DS_Store
+# /FlowersShop.Spa/react-client/*.pem
+# /FlowersShop.Spa/react-client/
+# /FlowersShop.Spa/react-client/# debug
+# /FlowersShop.Spa/react-client/npm-debug.log*
+# /FlowersShop.Spa/react-client/yarn-debug.log*
+# /FlowersShop.Spa/react-client/yarn-error.log*
+# /FlowersShop.Spa/react-client/
+# /FlowersShop.Spa/react-client/# env files (can opt-in for committing if needed)
+# /FlowersShop.Spa/react-client/.env*
+# /FlowersShop.Spa/react-client/
+# /FlowersShop.Spa/react-client/# vercel
+# /FlowersShop.Spa/react-client/.vercel
+# /FlowersShop.Spa/react-client/
+# /FlowersShop.Spa/react-client/# typescript
+# /FlowersShop.Spa/react-client/*.tsbuildinfo
+# /FlowersShop.Spa/react-client/next-env.d.ts
