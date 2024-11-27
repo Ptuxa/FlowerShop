@@ -3,7 +3,11 @@ import "./globals.css";
 import Layout, { Content, Footer, Header } from "antd/es/layout/layout";
 
 // const items = [
-    
+
+// ];
+
+// const items = [
+
 // ];
 
 export default function RootLayout({
@@ -12,17 +16,20 @@ export default function RootLayout({
     children: React.ReactNode;
 }>) {
     return (
-        <html lang="en">
-            <body>
-                <Layout style={{ minHeight: "100vh" }}>
-                    <Header>
-                        {/* <Menu/> */}
-                    </Header>
-                    <Content></Content>                
-                    <Footer></Footer>
-                </Layout>
-            </body>            
-        </html>
+        <Layout style={{ minHeight: '100vh' }}>
+            <Header>
+                <TopMenu />
+            </Header>
+            <Layout>
+                <Sider width={200} style={{ background: '#fff' }}>
+                    <BookSection />
+                </Sider>
+                <Content style={{ padding: '0 50px' }}>
+                    {/* Main content here */}
+                </Content>
+            </Layout>
+            <Footer style={{ textAlign: 'center' }}>Book store 2023 Created by Ptuxa</Footer>
+        </Layout>
     );
 }
 
