@@ -15,6 +15,9 @@ const SALT_ROUNDS = Number(process.env.SALT_ROUNDS) || 10;
 const COOKIES_FIELD_NAME_ACCESS_TOKEN = "accessTokenValue";
 const COOKIES_FIELD_NAME_REFRESH_TOKEN = "refreshTokenValue";
 
+export const AUTH_ROUTE = "/api/auth";
+export const UPDATE_ACCESS_TOKEN_ROUTE = "/update-access-token";
+
 const generateSalt = async (rounds: number): Promise<string> => {
     return await bcrypt.genSalt(rounds);
 };
@@ -56,6 +59,7 @@ export const setTokensDataInCookiesResponse = (res: Response, tokensDataForCooki
         secure: false,
         expires: new Date(tokensDataForCookies.expirationRefreshTokenTimestamp * 1000),
         sameSite: "strict",
+        path: AUTH_ROUTE + UPDATE_ACCESS_TOKEN_ROUTE,
     });
 
     return res;
@@ -77,7 +81,10 @@ export const clearTokensDataInCookiesResponse = (res: Response): Response => {
     return res;
 };
 
-export const setAccessTokenDataInCookiesResponse = (res: Response, accessTokenDataForCookies: AccessTokenDataForCookies): Response => {
+export const setAccessTokenDataInCookiesResponse = (
+    res: Response,
+    accessTokenDataForCookies: AccessTokenDataForCookies
+): Response => {
     res.cookie(COOKIES_FIELD_NAME_ACCESS_TOKEN, accessTokenDataForCookies.accessTokenValue, {
         httpOnly: true,
         secure: false,
@@ -86,4 +93,4 @@ export const setAccessTokenDataInCookiesResponse = (res: Response, accessTokenDa
     });
 
     return res;
-}
+};
