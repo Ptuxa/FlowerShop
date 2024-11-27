@@ -26,6 +26,7 @@ import { UpdateAccessTokenMapper } from "./service/mapper/updateAccessTokenMappe
 import { ImageMiddleware } from "./configuration/middleware/imageMiddleware";
 import path from "path";
 import { AUTH_ROUTE } from "./service/utils/authenticationFunctions";
+import cors from "cors";
 
 declare global {
     namespace Express {
@@ -85,6 +86,11 @@ app.use("/api/category", categoryRouter.initRoutes());
 app.use("/api/product", productRouter.initRoutes());
 app.use("/api/image", imageRouter.initRoutes(), imageMiddleware.errorProcessing);
 app.use(AUTH_ROUTE, authenticationRouter.initRoutes());
+
+app.use(cors({
+    origin: "http://localhost:3000",
+    credentials: true
+}));
 
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
