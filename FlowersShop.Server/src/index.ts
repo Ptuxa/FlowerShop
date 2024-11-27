@@ -31,7 +31,6 @@ declare global {
         interface Request {
             authentication?: {
                 userId: string;
-                expirationTimestamp: number
             };
         }
     }

@@ -27,23 +27,9 @@ export class AuthMiddleware {
     }
 
     public authenticate = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-        const authHeader = req.headers.authorization;
-
-        if (authHeader === undefined || !authHeader.startsWith(this.HEADER_AUTH_START_NAME)) {
-            res.status(403).json({ message: "Authentication is required." });
-            return;
-        }
-
-        let accessTokenValue = authHeader?.substring(this.HEADER_AUTH_START_NAME.length);
-
-        if (accessTokenValue === undefined) {
-            throw Error("Error: accessTokenValue cannot be undefined");
-        }
-
         let decodedAccessToken: string | jwt.JwtPayload = "";
-
         try {
-            decodedAccessToken = verifyAccessToken(accessTokenValue);
+            decodedAccessToken = verifyAccessToken(req.cookies.accessTokenValue);
         } catch (err) {
             res.status(403).json({ message: `Invalid access token ${err}` });
             return;
@@ -51,24 +37,17 @@ export class AuthMiddleware {
 
         req.authentication = {
             userId: (decodedAccessToken as jwt.JwtPayload).userId,
-            expirationTimestamp: (decodedAccessToken as jwt.JwtPayload).expirationTimestamp
         };
 
+        let accessTokenValueFromRep: string | jwt.JwtPayload = "";
         try {
-            accessTokenValue = await this.accessTokenRepository.getAccessTokenValueByUserId(req.authentication.userId);
+            accessTokenValueFromRep = await this.accessTokenRepository.getAccessTokenValueByUserId(req.authentication.userId);
         } catch (err) {
             res.status(403).json({ message: `Invalid access token ${err}` });
             return;
         }
 
-        try {
-            decodedAccessToken = verifyAccessToken(accessTokenValue);
-        } catch (err) {
-            res.status(403).json({ message: `Invalid access token ${err}` });
-            return;
-        }
-
-        if ((decodedAccessToken as jwt.JwtPayload).expirationTimestamp !== req.authentication.expirationTimestamp) {
+        if (accessTokenValueFromRep !== req.cookies.accessTokenValue) {
             res.status(403).json({ message: `Invalid access token` });     
             return;       
         }

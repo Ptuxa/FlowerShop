@@ -1,4 +1,5 @@
 import { ProductRequest } from "../../model/dto/request/productRequest";
+import { ProductsByCategoryIdsRequest } from "../../model/dto/request/productsCategoryIdsRequest";
 import { ProductResponse } from "../../model/dto/response/productResponse";
 import { Product } from "../../model/entity/product";
 import { ProductRepository } from "../../repository/productRepository";
@@ -30,6 +31,18 @@ export class ProductService {
 
         try {
             products = await this.productRepository.getAll();
+        } catch (error) {
+            throw new Error("Error in ProductService getAllCategories: " + error);
+        }
+
+        return this.productMapper.toProductResponseList(products);
+    }
+
+    public async getAllProductsByCategoryIds(productsByCategoryIdsRequest: ProductsByCategoryIdsRequest): Promise<ProductResponse[]> {
+        let products: Product[] | null;
+
+        try {
+            products = await this.productRepository.getAllByCategoryIds(productsByCategoryIdsRequest.categoryIds);
         } catch (error) {
             throw new Error("Error in ProductService getAllCategories: " + error);
         }

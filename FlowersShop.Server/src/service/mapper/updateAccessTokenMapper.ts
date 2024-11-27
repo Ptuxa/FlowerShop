@@ -1,7 +1,7 @@
-import { UpdateAccessTokenResponse } from "../../model/dto/response/updateAccessTokenResponse";
+import { AccessTokenDataForCookies } from "../../model/dto/response/updateAccessTokenResponse";
 
 export class UpdateAccessTokenMapper {
-    public toUpdateAccessTokenResponse(accessTokenValue: string): UpdateAccessTokenResponse {
+    public toUpdateAccessTokenResponse(accessTokenValue: string): AccessTokenDataForCookies {
         return {
             accessTokenValue: accessTokenValue
         };

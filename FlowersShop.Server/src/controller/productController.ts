@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { ProductService } from "../service/impl/productService";
 import { ProductRequest } from '../model/dto/request/productRequest';
+import { ProductsByCategoryIdsRequest } from '../model/dto/request/productsCategoryIdsRequest';
 
 class ProductController {
     private productService: ProductService;
@@ -26,6 +27,16 @@ class ProductController {
             res.status(500).json({ message: `Error retrieving products: ${(error as Error).message}` });
         }
     };
+
+    public getAllProductsByCategoryIds = async (req: Request, res: Response): Promise<void> => {
+        try {
+            const productsByCategoryIdsRequest: ProductsByCategoryIdsRequest = req.body;
+            const productsResponse = await this.productService.getAllProductsByCategoryIds(productsByCategoryIdsRequest);
+            res.status(200).json(productsResponse);
+        } catch (error) {
+            res.status(500).json({ message: `Error retrieving products: ${(error as Error).message}` });
+        }
+    }
 
     public createProduct = async (req: Request, res: Response): Promise<void> => {
         try {

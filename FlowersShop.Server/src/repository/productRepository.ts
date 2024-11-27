@@ -88,6 +88,29 @@ export class ProductRepository {
         return Promise.resolve(products);
     }
 
+    public async getAllByCategoryIds(categoryIds: string[]): Promise<Product[]> {
+        let rows: RowDataPacket[];
+
+        const categorIdsString = categoryIds.map(() => '?').join(', ');
+
+        try {
+            [rows] = await db.query<RowDataPacket[]>(`SELECT * FROM \`products\` WHERE \`category_id\` IN (${categorIdsString});`, );
+        } catch (error) {
+            throw new Error("Get all product error: " + error);
+        }
+
+        const products: Product[] = rows.map((row: any) => ({
+            id: row.id,
+            categoryId: row.category_id,
+            name: row.name,
+            amount: row.amount,
+            price: row.price,
+            imageName: row.image_name,
+        }));
+
+        return Promise.resolve(products);
+    }
+
     public async save(product: Product): Promise<Product> {
         let isExistProduct: Boolean = true;
 
