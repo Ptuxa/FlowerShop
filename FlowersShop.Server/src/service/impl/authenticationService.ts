@@ -165,6 +165,6 @@ export class AuthenticationService {
             throw new Error("Error in AuthenticationService signInUser: " + error);
         }
 
-        return this.updateAccessTokenMapper.toUpdateAccessTokenResponse(accessTokenValue);
+        return this.updateAccessTokenMapper.toAccessTokenDataForCookies(accessTokenValue, expirationAccessTokenTimestamp);
     }
 }

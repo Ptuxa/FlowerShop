@@ -1,3 +1,3 @@
 export interface LoadImageResponse {
-    fileName: string;
+    imageName: string;
 }

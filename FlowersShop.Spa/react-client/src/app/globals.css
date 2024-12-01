@@ -31,8 +31,14 @@
     gap: 20px;
 }
 
-.card__title {
+.card__title {  
     margin-right: 20px;
     max-width: 80%;
     white-space: normal;
+}
+
+.card__amount {
+    font-size: 14px;
+    line-height: 18px;
+    color: gray; /* можно задать нейтральный цвет */
 }

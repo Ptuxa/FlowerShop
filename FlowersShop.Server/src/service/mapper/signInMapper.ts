@@ -20,11 +20,4 @@ export class SignInMapper {
             userId: userId
         };
     }
-
-    public toSignInResponse(accessTokenValue: string, refreshTokenValue: string): TokensDataForCookies {
-        return {
-            accessTokenValue: accessTokenValue,
-            refreshTokenValue: refreshTokenValue,
-        };
-    }
 }
