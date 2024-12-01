@@ -4,22 +4,19 @@ import { Button, Menu } from "antd";
 import Link from "next/link";
 import { useAuth } from "../context/authContext";
 
-
 export const TopMenuComponent = () => {
     const { isAuthorized, setIsAuthorized } = useAuth();
 
+    const items = [
+        { key: "home", label: <Link href={"/catalog"}>Home</Link> },
+        { key: "login", style: {marginLeft: 'auto'}, label: <Button type="primary" href="/sign-in">
+            {
+                isAuthorized ? "Log out" : "Sign in"
+            }
+        </Button> }
+    ];
+
     return (
-        <Menu theme="dark" mode="horizontal">
-            <Menu.Item key="catalog">
-                <Link href="/">Catalog</Link>
-            </Menu.Item>
-            <Menu.Item key="login" style={{ marginLeft: 'auto' }}>
-                <Button type="primary" href="/login">
-                    {
-                        isAuthorized ? "Sign in" : "Log out"
-                    }
-                </Button>
-            </Menu.Item>
-        </Menu>
+        <Menu theme="dark" mode="horizontal" items={items}/>  
     );
 };

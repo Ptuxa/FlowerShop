@@ -1,6 +1,7 @@
 import Layout, { Content, Footer, Header } from "antd/es/layout/layout";
 import { TopMenuComponent } from "@/app/extension/component/topMenuComponent";
 import { CommonLayoutComponent } from "@/app/extension/component/commonLayoutComponent";
+import { useEffect } from "react";
 
 export default function CatalogLayout({
     children,

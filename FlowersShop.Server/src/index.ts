@@ -42,6 +42,8 @@ const PORT = process.env.PORT || 5000;
 
 const IMAGES_PATH = path.join(__dirname, "../uploads/images");
 
+const ALLOWED_ORIGINS = ["http://localhost:3000"];
+
 const categoryMapper = new CategoryMapper();
 const productMapper = new ProductMapper();
 const imageMapper = new ImageMapper();
@@ -82,15 +84,23 @@ const authenticationRouter = new AuthenticationRouter(authenticationController, 
 
 const app = express();
 app.use(express.json());
+
+app.use(cors({
+    origin: (origin, callback) => {
+        console.log("Origin:", origin);
+        if (!origin || ALLOWED_ORIGINS.includes(origin)) {
+            callback(null, true);
+        } else {
+            callback(new Error("Not allowed by CORS"));
+        }
+    },
+    credentials: true
+}));
+
 app.use("/api/category", categoryRouter.initRoutes());
 app.use("/api/product", productRouter.initRoutes());
 app.use("/api/image", imageRouter.initRoutes(), imageMiddleware.errorProcessing);
 app.use(AUTH_ROUTE, authenticationRouter.initRoutes());
-
-app.use(cors({
-    origin: "http://localhost:3000",
-    credentials: true
-}));
 
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);

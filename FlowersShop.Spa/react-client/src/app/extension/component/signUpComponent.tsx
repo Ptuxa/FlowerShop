@@ -7,7 +7,7 @@ const { Title, Text } = Typography;
 
 export const SignUpComponent = () => {
     const handleRegister = (values: any) => {
-        console.log("Registration Data: ", values);
+        // console.log("Registration Data: ", values);
     };
 
     return (

@@ -3,12 +3,18 @@
 import { Form, Input, Button, Typography, Space } from "antd";
 import Link from "next/link";
 import { useAuth } from "../context/authContext";
+import { useEffect } from "react";
 
 const { Title, Text } = Typography;
 
 
 export const SignInComponent = () => {
     const { isAuthorized, setIsAuthorized } = useAuth();
+
+    useEffect(() => {
+        // Это выполнится только на клиенте
+        console.log("Client-side render");
+    }, []);
 
     const handleLogin = (values: any) => {
         console.log("Login Data: ", values);
@@ -40,7 +46,7 @@ export const SignInComponent = () => {
             </Form>
             <Space direction="vertical" size="middle">
                 <Text>
-                    Don't have an account? <Link href="/pages/sign-up">Register here</Link>
+                    Don't have an account? <Link href="/sign-up">Register here</Link>
                 </Text>
             </Space>
         </div>
