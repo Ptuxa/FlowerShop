@@ -12,7 +12,7 @@ export const CardTitleComponent = ({ name, price, amount}: CardTitleProps) => {
         >
             <div style={{ display: "flex", flexDirection: "column" }}>
                 <p className="card__title">{name}</p>
-                <p className="card__amount">{amount} шт.</p>
+                <p className="card__amount">{amount}</p>
             </div>
             <p className="card__price">{price}</p>  
         </div>

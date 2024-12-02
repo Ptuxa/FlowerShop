@@ -6,11 +6,15 @@ import { Button, Input, Modal, Select, Upload } from "antd";
 import { OperationType } from "../enum/operationType";
 import TextArea from "antd/es/input/TextArea";
 import { ImageService } from "../services/impl/imageService";
+import { ProductMapper } from "../services/mapper/productMapper";
+import { ProductRequest } from "../model/dto/request/productRequest";
 
 export const CreateUpdateProductModal = ({
-    operationType,
     isModalOpen,
+    operationType,
+    product,
     categories,
+    loadAllCategories,
     handleCreate,
     handleUpdate,
     handleCancel
@@ -20,15 +24,39 @@ export const CreateUpdateProductModal = ({
     const [price, setPrice] = useState<number>(0);
     const [amount, setAmount] = useState<number>(0);
     const [categoryId, setCategoryId] = useState<string | null>(null);
+    const [imageName, setImageName] = useState<string | null>(null);
+
+    const [loadingCategories, setLoadingCategories] = useState<boolean>(true);
+
+    const setSafeCategoryId = (): void => {
+        const isCategoryValid = categories.some((category) => category.id === product.categoryId);
+        
+        if (isCategoryValid) {
+            setCategoryId(product.categoryId);
+        } else {
+            setCategoryId(null);
+        }
+    }
 
     useEffect(() => {
-        
-    }, []);
+        if (isModalOpen) {
+            setName(product.name);
+            setPrice(product.price);
+            setAmount(product.amount);            
+            setImageName(product.imageName);
+
+            setLoadingCategories(true);
+            loadAllCategories();
+            setLoadingCategories(false);
+
+            setSafeCategoryId();
+        }
+    }, [isModalOpen]);
 
     const defineTitleModal = (operationType: OperationType): string => {
         if (operationType === OperationType.Create) {
             return "Add product";
-        } else if (operationType === OperationType.Edit) {
+        } else if (operationType === OperationType.Update) {
             return "Edit product";
         }
 
@@ -36,29 +64,29 @@ export const CreateUpdateProductModal = ({
     }
 
     const handleFileUpload = async (file: File) => {
-        let fileName: string;
+        let imageName: string;
 
         try {
-            fileName = await ImageService.sendImage(file);
+            imageName = await ImageService.sendImage(file);
         } catch (error) {
             throw error;
         }
+
+        setImageName(imageName);
     };
-    
+
     const handleOnOk = async () => {
-        console.log("OK")
+        const productRequest: ProductRequest = {
+            name: name,
+            price: price,
+            amount: amount,
+            categoryId: categoryId,
+            imageName: imageName
+        }
 
-        // const productRequest: ProductRequest = {
-        //     name: name,
-        //     price: price,
-        //     amount: amount,
-        //     categoryId: categoryId,
-        //     imageName: imageName
-        // };
-
-        // operationType == OperationType.Create
-        //     ? handleCreate(productRequest)
-        //     : handleUpdate(productId, productRequest);
+        operationType == OperationType.Create
+            ? handleCreate(productRequest)
+            : handleUpdate(product.id, productRequest);
     }
 
     return (
@@ -103,12 +131,20 @@ export const CreateUpdateProductModal = ({
                 <Upload
                     beforeUpload={(file) => {
                         handleFileUpload(file);
-                        return false;
+                        return false; // Останавливает автоматическую загрузку
                     }}
                     maxCount={1}
                 >
-                    <Button>Load image:</Button>
+                    <Button>Load image</Button>
                 </Upload>
+
+                {imageName && (
+                    <img
+                        src={ImageService.getImageServerUrlByImageName(imageName)}
+                        alt="Uploaded file"
+                        style={{ maxWidth: "100%", marginTop: "10px" }}
+                    />
+                )}
             </div>
         </Modal>
     );

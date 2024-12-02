@@ -46,22 +46,26 @@ export class ImageService {
         }
     };
 
-    public static getImageUrlByFileName = async (fileName: string) => {
-        let getImageByFileNameResponse: Response;
+    public static getImageTempUrlByImageName = async (imageName: string): Promise<string> => {
+        let getImageTempUrlByImageNameResponse: Response;
 
         try {
-            getImageByFileNameResponse = await fetch(`http://localhost:5000/api/image/${fileName}`, {
+            getImageTempUrlByImageNameResponse = await fetch(`http://localhost:5000/api/image/${imageName}`, {
                 method: "GET",
             });
         } catch (error) {
             throw new Error(`Delete image error ${error}`);
         }
 
-        if (getImageByFileNameResponse.status !== 200) {
+        if (getImageTempUrlByImageNameResponse.status !== 200) {
             throw new Error(`Cannot delete image`);
         }
 
-        const blob = await getImageByFileNameResponse.blob();
+        const blob = await getImageTempUrlByImageNameResponse.blob();
         return URL.createObjectURL(blob); 
     };
+
+    public static getImageServerUrlByImageName = (imageName: string): string => {
+        return `http://localhost:5000/api/image/${imageName}`;
+    }
 }

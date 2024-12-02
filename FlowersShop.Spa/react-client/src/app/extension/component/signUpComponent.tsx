@@ -2,18 +2,30 @@
 
 import { Form, Input, Button, Typography } from "antd";
 import Link from "next/link";
+import { SignUpFieldsData } from "../struct/signUpFieldsData";
+import { AuthenticationService } from "../services/impl/authenticationService";
+import { AuthenticationMapper } from "../services/mapper/authenticationMapper";
+import { useRouter } from 'next/router';
 
 const { Title, Text } = Typography;
 
+const router = useRouter();
+
 export const SignUpComponent = () => {
-    const handleRegister = (values: any) => {
-        // console.log("Registration Data: ", values);
+    const handleRegister = async (signUpFieldsData: SignUpFieldsData): Promise<void> => {
+        try {
+            await AuthenticationService.signUpUser(AuthenticationMapper.toSignUpRequest(signUpFieldsData))
+        } catch(error) {
+            throw error;
+        }
+        
+        router.push("/login");
     };
 
     return (
         <div style={{ maxWidth: 400, margin: "0 auto", padding: "50px" }}>
             <Title level={3}>Register</Title>
-            <Form layout="vertical" onFinish={handleRegister}>
+            <Form layout="vertical" onFinish={(values) => handleRegister(values)}>
                 <Form.Item
                     label="Email"
                     name="email"

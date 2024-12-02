@@ -41,7 +41,7 @@ export class CategoryService {
         return CategoryMapper.toCategories(await getCategoryAllResponse.json());
     }
 
-    public static createCategory = async (categoryRequset: CategoryRequest): Promise<CategoryResponse> => {
+    public static createCategory = async (categoryRequset: CategoryRequest): Promise<Category> => {
         let createCategoryResponse: Response;
 
         try {
@@ -64,7 +64,7 @@ export class CategoryService {
         return CategoryMapper.toCategory(await createCategoryResponse.json());
     }
 
-    public static updateCategory = async (id: string, categoryRequset: CategoryRequest): Promise<CategoryRequest> => {
+    public static updateCategory = async (id: string, categoryRequset: CategoryRequest): Promise<Category> => {
         let updateCategoryResponse: Response;
 
         try {

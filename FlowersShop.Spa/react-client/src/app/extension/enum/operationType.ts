@@ -1,4 +1,4 @@
 export enum OperationType {
     Create,
-    Edit
+    Update
 }

@@ -2,6 +2,7 @@ import { ProductsByCategoryIdsRequest } from "@/app/extension/model/dto/request/
 import { ProductResponse } from "@/app/extension/model/dto/response/productResponse";
 import { Category } from "@/app/extension/model/entity/category";
 import { Product } from "@/app/extension/model/entity/product";
+import { ProductRequest } from "../../model/dto/request/productRequest";
 
 export class ProductMapper {
     public static toProductsByCategoryIdsRequest(categories: Category[]): ProductsByCategoryIdsRequest {
@@ -10,6 +11,16 @@ export class ProductMapper {
         } 
 
         return productsByCategoryIdsRequest;
+    }
+
+    public static toProductRequest(product: Product): ProductRequest {
+        return {
+            name: product.name,
+            price: product.price,
+            amount: product.amount,
+            imageName: product.imageName,
+            categoryId: product.categoryId
+        };
     }
 
     public static toProduct(productResponse: ProductResponse): Product {

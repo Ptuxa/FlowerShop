@@ -5,6 +5,7 @@ import { Product } from "../model/entity/product"
 import { ProductCardsProps } from "../props/productCardsProps"
 import { CardTitleComponent } from "./cardTitleComponent"
 import Button from "antd/es/button/button"
+import { ImageService } from "../services/impl/imageService";
 
 export const ProductCardsComponent = ({ products, handleUpdate, handleDelete }: ProductCardsProps) => {
     return (
@@ -17,10 +18,13 @@ export const ProductCardsComponent = ({ products, handleUpdate, handleDelete }: 
                         bordered={false}
                     >
                         <div className="card__buttons">
-                            {/* <img
-                                alt="image"
-                                src={url}
-                            /> */}
+                            {product.imageName && (
+                                <img
+                                    src={ImageService.getImageServerUrlByImageName(product.imageName)}
+                                    alt="Product image"
+                                    style={{ maxWidth: "100%", marginTop: "10px" }}
+                                />
+                            )}
                             <Button onClick={() => handleUpdate(product)} style={{ flex: 1 }}>Edit</Button>
                             <Button onClick={() => handleDelete(product.id)} danger style={{ flex: 1 }}>Delete</Button>
                         </div>

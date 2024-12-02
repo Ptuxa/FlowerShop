@@ -1,9 +1,9 @@
 "use client";
 
 import React, { createContext, useContext, useState } from "react";
-import { AuthContextProps } from "../model/struct/authContextProps";
+import { AuthContextData } from "../struct/authContextData";
 
-const AuthContext = createContext<AuthContextProps | undefined>(undefined);
+const AuthContext = createContext<AuthContextData | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const [isAuthorized, setIsAuthorized] = useState<boolean>(false);

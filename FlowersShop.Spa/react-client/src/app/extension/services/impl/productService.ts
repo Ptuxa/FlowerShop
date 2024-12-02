@@ -64,7 +64,7 @@ export class ProductService {
         return ProductMapper.toProducts(await getAllProductsByCategoryIdsResponse.json());
     }
     
-    public static createProduct = async (productRequset: Product): Promise<ProductResponse> => {
+    public static createProduct = async (productRequest: ProductRequest): Promise<Product> => {
         let createProductResponse: Response;
     
         try {
@@ -73,7 +73,7 @@ export class ProductService {
                 headers: {
                     "content-type": "application/json",            
                 },
-                body: JSON.stringify(productRequset),
+                body: JSON.stringify(productRequest),
                 credentials: "include"
             });
         } catch(error) {
@@ -87,7 +87,7 @@ export class ProductService {
         return ProductMapper.toProduct(await createProductResponse.json());
     }
     
-    public static updateProduct = async (id: string, productRequset: Product): Promise<ProductResponse> => {
+    public static updateProduct = async (id: string, productRequest: ProductRequest): Promise<Product> => {
         let updateProductResponse: Response;
     
         try {
@@ -96,7 +96,7 @@ export class ProductService {
                 headers: {
                     "content-type": "application/json",            
                 },
-                body: JSON.stringify(productRequset),
+                body: JSON.stringify(productRequest),
                 credentials: "include"
             });
         } catch(error) {

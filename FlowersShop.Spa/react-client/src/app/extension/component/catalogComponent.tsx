@@ -7,24 +7,38 @@ import { Category } from "../model/entity/category";
 import { Product } from "../model/entity/product";
 import { ProductService } from "../services/impl/productService";
 import { ProductMapper } from "../services/mapper/productMapper";
-import { ProductCardsComponent } from "./productCardsComponent";
 import { OperationType } from "../enum/operationType";
 import { CreateUpdateProductModal } from "./createUpdateProductModal";
+import { ProductRequest } from "../model/dto/request/productRequest";
+import { ProductCardsComponent } from "./productCardsComponent";
 
 const { Title } = Typography;
 
 
 
-export const CatalogComponent = () => {  
+export const CatalogComponent = () => {
+    const defaultProduct: Product = {
+        id: "",
+        name: "",
+        price: 0,
+        amount: 0,
+        categoryId: null,
+        imageName: null
+    }
+
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [operationType, setOperationType] = useState<OperationType>(OperationType.Create);
-    const [categories, setCategories] = useState<Category[]>([]);
-    const [loadingCategories, setLoadingCategories] = useState<boolean>(true);
+    const [operationType, setOperationType] = useState(OperationType.Create);
     const [products, setProducts] = useState<Product[]>([]);
+    const [categories, setCategories] = useState<Category[]>([]);
+
+    const [loadingCategories, setLoadingCategories] = useState<boolean>(true);
     const [loadingProducts, setLoadingProducts] = useState<boolean>(true);
+
+    const [modalProduct, setModalProduct] = useState<Product>(defaultProduct)
 
     const loadAllCategories = async () => {
         let categories: Category[];
+        setLoadingCategories(true);
 
         try {
             categories = await CategoryService.getAllCategories();
@@ -39,6 +53,7 @@ export const CatalogComponent = () => {
 
     const loadAllProducts = async () => {
         let products: Product[];
+        setLoadingProducts(true);
 
         try {
             products = await ProductService.getAllProducts();
@@ -72,29 +87,60 @@ export const CatalogComponent = () => {
         loadAllProducts();
     }, []);
 
-    const handleCloseCreateUpdateProduct = async () => {
+    const handleCloseModal = async () => {
         setIsModalOpen(false);
     }
 
-    const handleCreateProduct = async () => {
+    const handleCreateProduct = async (productRequest: ProductRequest) => {
+        let product: Product;
+
+        try {
+            product = await ProductService.createProduct(productRequest);
+        } catch (error) {
+            throw error;
+        }
+
+        products.push(product)
+        setProducts(products)
+
+        await handleCloseModal();
+    }
+
+    const handleUpdateProduct = async (productId: string, productRequest: ProductRequest) => {
+        let updatedProduct: Product;
+
+        try {
+            updatedProduct = await ProductService.updateProduct(productId, productRequest);
+        } catch (error) {
+            throw error;
+        }
+
+        const updatedProducts = products.map((product) =>
+            product.id === updatedProduct.id ? updatedProduct : product
+        );
+
+        setProducts(updatedProducts);
+
+        await handleCloseModal();
+    }
+
+    const handleButtonAddProductClick = async () => {
+        setModalProduct(defaultProduct);
         setOperationType(OperationType.Create);
         setIsModalOpen(true);
     }
 
-    const handleUpdateProduct = async (product: Product) => {
-        setOperationType(OperationType.Edit);
+    const handleButtonUpdateProductClick = async (product: Product) => {
+        setModalProduct(product);
+        setOperationType(OperationType.Update);
         setIsModalOpen(true);
     }
 
-    const handleDeleteProduct = async (productId: string) => {
-        setLoadingProducts(true);
-
+    const handleButtonDeleteProductClick = async (productId: string) => {
         try {
             await ProductService.deleteProduct(productId);
         } catch (error) {
             throw error;
-        } finally {
-            setLoadingProducts(false);
         }
 
         setProducts(products.filter(product => product.id !== productId));
@@ -129,69 +175,32 @@ export const CatalogComponent = () => {
                         type="primary"
                         style={{ marginTop: '30px' }}
                         size="large"
-                        onClick={() => handleCreateProduct}
+                        onClick={() => handleButtonAddProductClick}
                     >
                         Add product
                     </Button>
 
                     <CreateUpdateProductModal
-                        operationType={operationType}
                         isModalOpen={isModalOpen}
+                        operationType={operationType}
+                        product={modalProduct}
                         categories={categories}
-                        handleCancel={handleCloseCreateUpdateProduct}
-                        handleCreate={handleCreateProduct}
-                        handleUpdate={handleUpdateProduct}
+                        loadAllCategories={() => loadAllCategories}
+                        handleCreate={(product) => handleCreateProduct(product)}
+                        handleUpdate={(productId, product) => handleUpdateProduct(productId, product)}
+                        handleCancel={() => handleCloseModal}
                     />
-
                     {
                         loadingProducts ?
                             <Title>Loading...</Title> :
-                            <ProductCardsComponent products={products} handleUpdate={handleUpdateProduct} handleDelete={handleDeleteProduct}></ProductCardsComponent>
+                            <ProductCardsComponent
+                                products={products}
+                                handleUpdate={(product) => handleButtonUpdateProductClick(product)}
+                                handleDelete={(productId) => handleButtonDeleteProductClick(productId)}>
+                            </ProductCardsComponent>
                     }
                 </div>
             </div>
         </>
     );
-
-    // const openCreateModal = () => {
-    //     setMode('create');
-    //     setIsModalOpen(true);
-    // };
-
-    // const openEditModal = (book: any) => {
-    //     setMode('update');
-    //     setValues(book);
-    //     setIsModalOpen(true);
-    // };
-
-    // const closeModal = () => {
-    //     setIsModalOpen(false);
-    // };
-
-    // const handleCreateBook = (newBook: any) => {
-    //     // Логика создания книги
-    //     setBooks([...books, newBook]);
-    //     closeModal();
-    // };
-
-    // const handleUpdateBook = (updatedBook: any) => {
-    //     // Логика обновления книги
-    //     const updatedBooks = books.map((book) =>
-    //         book.id === updatedBook.id ? updatedBook : book
-    //     );
-    //     setBooks(updatedBooks);
-    //     closeModal();
-    // };
-
-    // const handleDeleteBook = (bookId: string) => {
-    //     setBooks(books.filter((book) => book.id !== bookId));
-    // };
-
-    // const handleFilterChange = (checkedValues: any) => {
-    //     setFilters(checkedValues);
-    // };
-
-    // const handleApplyFilters = () => {
-
-    // };
 };
