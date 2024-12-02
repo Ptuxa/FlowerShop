@@ -91,6 +91,11 @@ export class ProductRepository {
     public async getAllByCategoryIds(categoryIds: string[]): Promise<Product[]> {
         let rows: RowDataPacket[];
 
+        if (categoryIds.length === 0)
+        {
+            return await this.getAll();
+        }
+
         const categorIdsString = categoryIds.map(() => '?').join(', ');
 
         try {

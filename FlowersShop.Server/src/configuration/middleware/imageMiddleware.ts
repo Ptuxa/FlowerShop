@@ -3,10 +3,11 @@ import multer from "multer";
 import path from "path";
 import { v4 as uuid } from "uuid";
 
+
 export class ImageMiddleware {
     private readonly ALLOWED_TYPES: string[] = ["image/jpeg", "image/png"];
     
-    private FILE_SIZE_MAX = 5 * 1024 * 1024
+    private FILE_SIZE_MAX = 1 * 1024 * 1024
     private uploadMiddleware: multer.Multer;
 
     constructor(imageFolderPath: string) {

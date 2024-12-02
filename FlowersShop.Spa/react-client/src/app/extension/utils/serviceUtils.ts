@@ -1,4 +1,5 @@
-import { updateAccessToken } from "../services/impl/authenticationService";
+import { AuthenticationService } from "../services/impl/authenticationService";
+import imageCompression from "browser-image-compression";
 
 export const fetchWithTokenRefresh = async (url: string, options: RequestInit): Promise<Response> => {
     let response;
@@ -12,7 +13,7 @@ export const fetchWithTokenRefresh = async (url: string, options: RequestInit): 
 
     if (response.status === 401) {
         try {
-            await updateAccessToken();
+            await AuthenticationService.updateAccessToken();
         } catch(error) {
             console.error("Request failed:", error);
             throw error;
@@ -26,4 +27,23 @@ export const fetchWithTokenRefresh = async (url: string, options: RequestInit): 
     }
 
     return response;
+};
+
+
+export const compressImage = async (file: File): Promise<File> => {
+    const options = {
+        maxSizeMB: 1,
+        maxWidthOrHeight: 64,
+        useWebWorker: true,
+    };
+
+    let compressedFile: File;
+
+    try {
+        compressedFile = await imageCompression(file, options);
+    } catch (error) {
+        throw error;
+    }
+
+    return compressedFile;
 };

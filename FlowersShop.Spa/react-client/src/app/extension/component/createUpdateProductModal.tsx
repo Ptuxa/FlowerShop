@@ -8,6 +8,7 @@ import TextArea from "antd/es/input/TextArea";
 import { ImageService } from "../services/impl/imageService";
 import { ProductMapper } from "../services/mapper/productMapper";
 import { ProductRequest } from "../model/dto/request/productRequest";
+import { compressImage } from "../utils/serviceUtils";
 
 export const CreateUpdateProductModal = ({
     isModalOpen,
@@ -67,7 +68,7 @@ export const CreateUpdateProductModal = ({
         let imageName: string;
 
         try {
-            imageName = await ImageService.sendImage(file);
+            imageName = await ImageService.sendImage(await compressImage(file));
         } catch (error) {
             throw error;
         }

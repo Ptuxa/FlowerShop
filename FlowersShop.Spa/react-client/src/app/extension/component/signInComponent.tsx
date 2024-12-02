@@ -5,23 +5,23 @@ import Link from "next/link";
 import { useAuth } from "../context/authContext";
 import { useEffect } from "react";
 import { AuthenticationService } from "../services/impl/authenticationService";
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 import { AuthenticationMapper } from "../services/mapper/authenticationMapper";
 import { SignInRequest } from "../model/dto/request/signInRequest";
 import { SignInFieldsData } from "../struct/signInFieldsData";
+import { BackButtonComponent } from "./backButtonComponent";
 
 const { Title, Text } = Typography;
 
 
-const router = useRouter();
-
 export const SignInComponent = () => {
+    const router = useRouter();
     const { isAuthorized, setIsAuthorized } = useAuth();
 
     const handleLogin = async (signInFieldsData: SignInFieldsData): Promise<void> => {
         try {
             await AuthenticationService.signInUser(AuthenticationMapper.toSignInRequest(signInFieldsData))
-        } catch(error) {
+        } catch (error) {
             throw error;
         }
 
@@ -30,9 +30,11 @@ export const SignInComponent = () => {
     };
 
     return (
-        <div style={{ maxWidth: 400, margin: "0 auto", padding: "50px" }}>
-            <Title level={3}>Login</Title>
-            <Form layout="vertical" onFinish={(values) => handleLogin(values)}>
+        <div style={{ position: "relative" }}>
+            <BackButtonComponent />
+            <div style={{ maxWidth: 400, margin: "0 auto", padding: "50px" }}>
+                <Title level={3}>Login</Title>
+                <Form layout="vertical" onFinish={(values) => handleLogin(values)}>
                 <Form.Item
                     label="Email"
                     name="email"
@@ -52,12 +54,11 @@ export const SignInComponent = () => {
                         Login
                     </Button>
                 </Form.Item>
-            </Form>
-            <Space direction="vertical" size="middle">
+                </Form>
                 <Text>
-                    Don't have an account? <Link href="/sign-up">Register here</Link>
+                    Don't have an account? <Link href="sign-up">Register here</Link>
                 </Text>
-            </Space>
+            </div>
         </div>
     );
 }

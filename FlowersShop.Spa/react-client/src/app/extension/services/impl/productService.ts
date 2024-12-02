@@ -54,11 +54,11 @@ export class ProductService {
                 body: JSON.stringify(productsByCategoryIdsRequest)
             });
         } catch(error) {
-            throw new Error(`Get all products error ${error}`);
+            throw new Error(`Get all products by category ids error ${error}`);
         }
     
         if (getAllProductsByCategoryIdsResponse.status !== 200) {
-            throw new Error(`Cannot get all products`);
+            throw new Error(`Cannot get all products by category ids`);
         }
     
         return ProductMapper.toProducts(await getAllProductsByCategoryIdsResponse.json());
@@ -103,7 +103,7 @@ export class ProductService {
             throw new Error(`Update product error ${error}`);
         }
     
-        if (updateProductResponse.status !== 201) {
+        if (updateProductResponse.status !== 200) {
             throw new Error(`Cannot update product`);
         }
     

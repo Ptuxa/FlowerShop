@@ -11,6 +11,7 @@ import { OperationType } from "../enum/operationType";
 import { CreateUpdateProductModal } from "./createUpdateProductModal";
 import { ProductRequest } from "../model/dto/request/productRequest";
 import { ProductCardsComponent } from "./productCardsComponent";
+import { useAuth } from "../context/authContext";
 
 const { Title } = Typography;
 
@@ -34,7 +35,9 @@ export const CatalogComponent = () => {
     const [loadingCategories, setLoadingCategories] = useState<boolean>(true);
     const [loadingProducts, setLoadingProducts] = useState<boolean>(true);
 
-    const [modalProduct, setModalProduct] = useState<Product>(defaultProduct)
+    const [modalProduct, setModalProduct] = useState<Product>(defaultProduct);
+
+    const { isAuthorized, setIsAuthorized } = useAuth();
 
     const loadAllCategories = async () => {
         let categories: Category[];
@@ -171,25 +174,31 @@ export const CatalogComponent = () => {
                     </Button>
                 </div>
                 <div>
-                    <Button
-                        type="primary"
-                        style={{ marginTop: '30px' }}
-                        size="large"
-                        onClick={() => handleButtonAddProductClick}
-                    >
-                        Add product
-                    </Button>
+                    {
+                        isAuthorized &&
+                        <>
+                            <Button
+                                type="primary"
+                                style={{ marginTop: '30px' }}
+                                size="large"
+                                onClick={() => handleButtonAddProductClick()}
+                            >
+                                Add product
+                            </Button>
 
-                    <CreateUpdateProductModal
-                        isModalOpen={isModalOpen}
-                        operationType={operationType}
-                        product={modalProduct}
-                        categories={categories}
-                        loadAllCategories={() => loadAllCategories}
-                        handleCreate={(product) => handleCreateProduct(product)}
-                        handleUpdate={(productId, product) => handleUpdateProduct(productId, product)}
-                        handleCancel={() => handleCloseModal}
-                    />
+                            <CreateUpdateProductModal
+                                isModalOpen={isModalOpen}
+                                operationType={operationType}
+                                product={modalProduct}
+                                categories={categories}
+                                loadAllCategories={() => loadAllCategories()}
+                                handleCreate={(product) => handleCreateProduct(product)}
+                                handleUpdate={(productId, product) => handleUpdateProduct(productId, product)}
+                                handleCancel={() => handleCloseModal()}
+                            />
+                        </>
+                    }
+
                     {
                         loadingProducts ?
                             <Title>Loading...</Title> :

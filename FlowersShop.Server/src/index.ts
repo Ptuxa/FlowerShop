@@ -27,6 +27,7 @@ import { ImageMiddleware } from "./configuration/middleware/imageMiddleware";
 import path from "path";
 import { AUTH_ROUTE } from "./service/utils/authenticationFunctions";
 import cors from "cors";
+import cookieParser from "cookie-parser";
 
 declare global {
     namespace Express {
@@ -85,9 +86,10 @@ const authenticationRouter = new AuthenticationRouter(authenticationController, 
 const app = express();
 app.use(express.json());
 
+app.use(cookieParser());
+
 app.use(cors({
     origin: (origin, callback) => {
-        console.log("Origin:", origin);
         if (!origin || ALLOWED_ORIGINS.includes(origin)) {
             callback(null, true);
         } else {
