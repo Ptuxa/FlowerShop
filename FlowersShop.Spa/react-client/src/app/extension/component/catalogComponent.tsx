@@ -32,6 +32,8 @@ export const CatalogComponent = () => {
     const [products, setProducts] = useState<Product[]>([]);
     const [categories, setCategories] = useState<Category[]>([]);
 
+    const [checkedCategoryIds, setCheckedCategoryIds] = useState<string[]>([]);
+
     const [loadingCategories, setLoadingCategories] = useState<boolean>(true);
     const [loadingProducts, setLoadingProducts] = useState<boolean>(true);
 
@@ -69,13 +71,13 @@ export const CatalogComponent = () => {
         setProducts(products);
     };
 
-    const filterProductsByCategory = async (filterCategories: Category[]) => {
+    const filterProductsByCategory = async (filterCategoryIds: string[]) => {
         setLoadingProducts(true);
 
         let products: Product[];
 
         try {
-            products = await ProductService.getAllProductsByCategoryIds(ProductMapper.toProductsByCategoryIdsRequest(filterCategories));
+            products = await ProductService.getAllProductsByCategoryIds(ProductMapper.toProductsByCategoryIdsRequest(filterCategoryIds));
         } catch (error) {
             throw error;
         } finally {
@@ -149,19 +151,23 @@ export const CatalogComponent = () => {
         setProducts(products.filter(product => product.id !== productId));
     }
 
+    const handleFilterCategoriesChange = (checkedValues: string[]) => {
+        setCheckedCategoryIds(checkedValues);
+    };
+
     return (
         <>
             <div style={{ display: 'flex', marginBottom: '30px' }}>
                 <div style={{ marginRight: '20px' }}>
                     <Title level={4}>Categories</Title>
-                    <Checkbox.Group>
+                    <Checkbox.Group value={checkedCategoryIds} onChange={handleFilterCategoriesChange}>
                         <Space direction="vertical">
                             {
                                 loadingCategories ?
                                     <Title>Loading...</Title> :
                                     <div>
                                         {categories.map((category) => (
-                                            <Checkbox key={category.id} value={category.name}>
+                                            <Checkbox key={category.id} value={category.id}>
                                                 {category.name}
                                             </Checkbox>
                                         ))}
@@ -169,7 +175,7 @@ export const CatalogComponent = () => {
                             }
                         </Space>
                     </Checkbox.Group>
-                    <Button type="primary" style={{ marginTop: '20px' }} onClick={() => filterProductsByCategory(categories)}>
+                    <Button type="primary" style={{ marginTop: '20px' }} onClick={() => filterProductsByCategory(checkedCategoryIds)}>
                         Apply
                     </Button>
                 </div>

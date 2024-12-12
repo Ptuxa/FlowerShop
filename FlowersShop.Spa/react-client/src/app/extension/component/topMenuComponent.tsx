@@ -26,6 +26,9 @@ export const TopMenuComponent = () => {
 
     const items = [
         { key: "home", label: <Link href={"/catalog"}>Home</Link> },
+        ...(isAuthorized
+            ? [{ key: "categories", label: <Link href={"/categories"}>Categories</Link> }]
+            : []),
         {
             key: "login", style: { marginLeft: 'auto' }, label: <Button type="primary" onClick={() => handleAuthButtonClick()}>
                 {

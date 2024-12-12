@@ -5,9 +5,9 @@ import { Product } from "@/app/extension/model/entity/product";
 import { ProductRequest } from "../../model/dto/request/productRequest";
 
 export class ProductMapper {
-    public static toProductsByCategoryIdsRequest(categories: Category[]): ProductsByCategoryIdsRequest {
+    public static toProductsByCategoryIdsRequest(categoryIds: string[]): ProductsByCategoryIdsRequest {
         const productsByCategoryIdsRequest: ProductsByCategoryIdsRequest = {
-            categoryIds: categories.map((category) => {return category.id})
+            categoryIds: categoryIds
         } 
 
         return productsByCategoryIdsRequest;

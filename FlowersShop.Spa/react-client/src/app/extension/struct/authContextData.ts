@@ -1,4 +1,4 @@
 export interface AuthContextData {
     isAuthorized: boolean;
-    setIsAuthorized: React.Dispatch<React.SetStateAction<boolean>>;
+    setIsAuthorized: (isAuthorized: boolean) => void;
 }

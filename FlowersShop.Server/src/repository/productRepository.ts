@@ -99,7 +99,7 @@ export class ProductRepository {
         const categorIdsString = categoryIds.map(() => '?').join(', ');
 
         try {
-            [rows] = await db.query<RowDataPacket[]>(`SELECT * FROM \`products\` WHERE \`category_id\` IN (${categorIdsString});`, );
+            [rows] = await db.query<RowDataPacket[]>(`SELECT * FROM \`products\` WHERE \`category_id\` IN (${categorIdsString})`, categoryIds);
         } catch (error) {
             throw new Error("Get all product error: " + error);
         }
