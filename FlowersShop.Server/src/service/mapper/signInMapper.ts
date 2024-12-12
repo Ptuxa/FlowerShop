@@ -1,4 +1,4 @@
-import { SignInResponse } from "../../model/dto/response/signInResponse";
+import { TokensDataForCookies } from "../../model/dto/response/signInCookiesResponse";
 import { AccessToken } from "../../model/entity/accessToken";
 import { RefreshToken } from "../../model/entity/refreshToken";
 import { v4 as uuid } from "uuid";
@@ -18,13 +18,6 @@ export class SignInMapper {
             value: value,
             expirationTimestamp: expirationTimestamp,
             userId: userId
-        };
-    }
-
-    public toSignInResponse(accessTokenValue: string, refreshTokenValue: string): SignInResponse {
-        return {
-            accessTokenValue: accessTokenValue,
-            refreshTokenValue: refreshTokenValue,
         };
     }
 }

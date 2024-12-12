@@ -16,14 +16,8 @@ class ProductRouter {
     }
 
     public initRoutes(): Router {
-        this.router.get(
-            "/:id",
-            this.productController.getProductById
-        );
-        this.router.get(
-            "/",
-            this.productController.getAllProducts
-        );
+        this.router.get("/:id", this.productController.getProductById);
+        this.router.get("/", this.productController.getAllProducts);
         this.router.post(
             "/",
             this.authMiddleware.authenticate,
@@ -42,6 +36,7 @@ class ProductRouter {
             this.authMiddleware.authorize([EnumUserRole.ADMIN]),
             this.productController.deleteProduct
         );
+        this.router.post("/filter", this.productController.getAllProductsByCategoryIds);
 
         return this.router;
     }

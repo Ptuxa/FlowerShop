@@ -1,9 +1,10 @@
-import { UpdateAccessTokenResponse } from "../../model/dto/response/updateAccessTokenResponse";
+import { AccessTokenDataForCookies } from "../../model/dto/response/updateAccessTokenResponse";
 
 export class UpdateAccessTokenMapper {
-    public toUpdateAccessTokenResponse(accessTokenValue: string): UpdateAccessTokenResponse {
+    public toAccessTokenDataForCookies(accessTokenValue: string, expirationAccessTokenTimestamp: number): AccessTokenDataForCookies {
         return {
-            accessTokenValue: accessTokenValue
+            accessTokenValue: accessTokenValue,
+            expirationAccessTokenTimestamp: expirationAccessTokenTimestamp
         };
     }
 }

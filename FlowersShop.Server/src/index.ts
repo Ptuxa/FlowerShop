@@ -25,13 +25,15 @@ import { AuthMiddleware } from "./configuration/middleware/authMiddleware";
 import { UpdateAccessTokenMapper } from "./service/mapper/updateAccessTokenMapper";
 import { ImageMiddleware } from "./configuration/middleware/imageMiddleware";
 import path from "path";
+import { AUTH_ROUTE } from "./service/utils/authenticationFunctions";
+import cors from "cors";
+import cookieParser from "cookie-parser";
 
 declare global {
     namespace Express {
         interface Request {
             authentication?: {
                 userId: string;
-                expirationTimestamp: number
             };
         }
     }
@@ -39,7 +41,9 @@ declare global {
 
 const PORT = process.env.PORT || 5000;
 
-const IMAGES_PATH = path.join(__dirname, "../uploads/images")
+const IMAGES_PATH = path.join(__dirname, "../uploads/images");
+
+const ALLOWED_ORIGINS = ["http://localhost:3000"];
 
 const categoryMapper = new CategoryMapper();
 const productMapper = new ProductMapper();
@@ -57,7 +61,14 @@ const refreshTokenRepository = new RefreshTokenRepository();
 const categoryService = new CategoryService(categoryRepository, productRepository, categoryMapper);
 const productService = new ProductService(productRepository, productMapper);
 const imageService = new ImageService(imageMapper, IMAGES_PATH);
-const authenticationService = new AuthenticationService(userRepository, accessTokenRepository, refreshTokenRepository, signInMapper, signUpMapper, updateAccessTokenMapper);
+const authenticationService = new AuthenticationService(
+    userRepository,
+    accessTokenRepository,
+    refreshTokenRepository,
+    signInMapper,
+    signUpMapper,
+    updateAccessTokenMapper
+);
 
 const categoryController = new CategoryController(categoryService);
 const productController = new ProductController(productService);
@@ -74,10 +85,24 @@ const authenticationRouter = new AuthenticationRouter(authenticationController, 
 
 const app = express();
 app.use(express.json());
-app.use('/api/category', categoryRouter.initRoutes());
-app.use('/api/product', productRouter.initRoutes());
-app.use('/api/image', imageRouter.initRoutes(), imageMiddleware.errorProcessing);
-app.use('/api/auth', authenticationRouter.initRoutes());
+
+app.use(cookieParser());
+
+app.use(cors({
+    origin: (origin, callback) => {
+        if (!origin || ALLOWED_ORIGINS.includes(origin)) {
+            callback(null, true);
+        } else {
+            callback(new Error("Not allowed by CORS"));
+        }
+    },
+    credentials: true
+}));
+
+app.use("/api/category", categoryRouter.initRoutes());
+app.use("/api/product", productRouter.initRoutes());
+app.use("/api/image", imageRouter.initRoutes(), imageMiddleware.errorProcessing);
+app.use(AUTH_ROUTE, authenticationRouter.initRoutes());
 
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);

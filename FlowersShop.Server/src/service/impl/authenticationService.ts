@@ -1,6 +1,6 @@
 import { SignInRequest } from "../../model/dto/request/signInRequest";
 import { SignUpRequest } from "../../model/dto/request/signUpRequest";
-import { SignInResponse } from "../../model/dto/response/signInResponse";
+import { TokensDataForCookies } from "../../model/dto/response/signInCookiesResponse";
 import { User } from "../../model/entity/user";
 import { AccessTokenRepository } from "../../repository/accessTokenRepository";
 import { RefreshTokenRepository } from "../../repository/refreshTokenRepository";
@@ -17,7 +17,7 @@ import {
 import { RefreshToken} from "../../model/entity/refreshToken"
 import { UpdateAccessTokenRequest } from "../../model/dto/request/updateAccessTokenRequest";
 import { UpdateAccessTokenMapper } from "../mapper/updateAccessTokenMapper";
-import { UpdateAccessTokenResponse } from "../../model/dto/response/updateAccessTokenResponse";
+import { AccessTokenDataForCookies } from "../../model/dto/response/updateAccessTokenResponse";
 import { AccessToken } from "../../model/entity/accessToken";
 import jwt from "jsonwebtoken";
 
@@ -45,7 +45,7 @@ export class AuthenticationService {
         this.updateAccessTokenMapper = updateAccessTokenMapper;
     }
 
-    public async signInUser(signInRequest: SignInRequest): Promise<SignInResponse> {
+    public async signInUser(signInRequest: SignInRequest): Promise<TokensDataForCookies> {
         let user: User | null;
 
         try {
@@ -82,7 +82,14 @@ export class AuthenticationService {
             throw new Error("Error in AuthenticationService signInUser: " + error);
         }
 
-        return this.signInMapper.toSignInResponse(accessTokenValue, refreshTokenValue);
+        const signInCookiesResponse: TokensDataForCookies = {
+            accessTokenValue,
+            refreshTokenValue, 
+            expirationAccessTokenTimestamp,
+            expirationRefreshTokenTimestamp
+        }
+
+        return signInCookiesResponse;
     }
 
     public async signUpUser(signUpRequest: SignUpRequest): Promise<void> {
@@ -107,31 +114,9 @@ export class AuthenticationService {
         }
     }
 
-    public async logoutUser(userId: string | undefined, expirationTimestamp: number | undefined): Promise<void> {
+    public async logoutUser(userId: string | undefined): Promise<void> {
         if (userId === undefined) {
             throw Error("Undefined userId when user logout");
-        }
-
-        if (expirationTimestamp === undefined) {
-            throw Error("Undefined expirationTimestamp when user logout");
-        }
-
-        let accessTokenValue: string | null;
-        try {
-            accessTokenValue = await this.accessTokenRepository.getAccessTokenValueByUserId(userId);
-        } catch (error) {
-            throw Error("Error in AuthenticationService updateAccessToken: " + error);
-        }
-
-        let decodedAccessToken: string | jwt.JwtPayload = "";
-        try {
-            decodedAccessToken = verifyAccessToken(accessTokenValue);
-        } catch (err) {
-            throw Error("Access token from database is invalid.")
-        }
-
-        if ((decodedAccessToken as jwt.JwtPayload).expirationTimestamp !== expirationTimestamp) {
-            throw Error("Access token is invalid");
         }
 
         try {
@@ -147,12 +132,12 @@ export class AuthenticationService {
         }
     }
 
-    public async updateAccessToken(refreshTokenValue: UpdateAccessTokenRequest): Promise<UpdateAccessTokenResponse> {
+    public async updateAccessToken(refreshTokenValue: string): Promise<AccessTokenDataForCookies> {
         let refreshToken: RefreshToken | null;
         let user: User | null;
 
         try {
-            refreshToken = await this.refreshTokenRepository.getRefreshTokenByValue(refreshTokenValue.refreshTokenValue);
+            refreshToken = await this.refreshTokenRepository.getRefreshTokenByValue(refreshTokenValue);
         } catch (error) {
             throw Error("Error in AuthenticationService updateAccessToken: " + error);
         }
@@ -180,6 +165,6 @@ export class AuthenticationService {
             throw new Error("Error in AuthenticationService signInUser: " + error);
         }
 
-        return this.updateAccessTokenMapper.toUpdateAccessTokenResponse(accessTokenValue);
+        return this.updateAccessTokenMapper.toAccessTokenDataForCookies(accessTokenValue, expirationAccessTokenTimestamp);
     }
 }

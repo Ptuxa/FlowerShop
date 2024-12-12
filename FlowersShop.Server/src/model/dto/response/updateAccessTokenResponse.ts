@@ -1,3 +1,4 @@
-export interface UpdateAccessTokenResponse {
+export interface AccessTokenDataForCookies {
     accessTokenValue: string;
+    expirationAccessTokenTimestamp: number;
 }

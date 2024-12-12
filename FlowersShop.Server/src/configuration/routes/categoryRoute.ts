@@ -15,16 +15,8 @@ class CategoryRouter {
     }
 
     public initRoutes(): Router {
-        this.router.get(
-            "/:id",
-            this.categoryController.getCategoryById
-        );
-        this.router.get(
-            "/",
-            this.authMiddleware.authenticate,
-            this.authMiddleware.authorize([EnumUserRole.USER, EnumUserRole.ADMIN]),
-            this.categoryController.getAllCategories
-        );
+        this.router.get("/:id", this.categoryController.getCategoryById);
+        this.router.get("/", this.categoryController.getAllCategories);
         this.router.post(
             "/",
             this.authMiddleware.authenticate,
