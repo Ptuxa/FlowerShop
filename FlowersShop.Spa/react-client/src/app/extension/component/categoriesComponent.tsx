@@ -10,6 +10,7 @@ import { CategoryRequest } from "../model/dto/request/categoryRequest";
 import Title from "antd/es/typography/Title";
 import { CategoryCardsComponent } from "./categoryCardsComponent";
 
+
 export const CategoriesComponent = () => {
     const defaultCategory: Category = {
         id: "",
@@ -27,7 +28,7 @@ export const CategoriesComponent = () => {
         setLoadingCategories(true);
 
         try {
-            categories = await CategoryService.getAllCategories();
+            categories = await CategoryService.getAllCategoriesSocket();
         } catch (error) {
             throw error;
         } finally {
