@@ -28,6 +28,8 @@ import path from "path";
 import { AUTH_ROUTE } from "./service/utils/authenticationFunctions";
 import cors from "cors";
 import cookieParser from "cookie-parser";
+import { Server } from "socket.io";
+import http from "http";
 
 declare global {
     namespace Express {
@@ -84,11 +86,18 @@ const imageRouter = new ImageRouter(imageController, authMiddleware, imageMiddle
 const authenticationRouter = new AuthenticationRouter(authenticationController, authMiddleware);
 
 const app = express();
+const server = http.createServer(app);
+const webSocketServerIO = new Server(server,{
+    cors: {
+        origin: ALLOWED_ORIGINS,
+        credentials: true 
+    }
+});
 app.use(express.json());
 
 app.use(cookieParser());
 
-app.use(cors({
+app.use(cors({  
     origin: (origin, callback) => {
         if (!origin || ALLOWED_ORIGINS.includes(origin)) {
             callback(null, true);
@@ -99,11 +108,11 @@ app.use(cors({
     credentials: true
 }));
 
-app.use("/api/category", categoryRouter.initRoutes());
+app.use("/api/category", categoryRouter.initRoutes(webSocketServerIO));
 app.use("/api/product", productRouter.initRoutes());
 app.use("/api/image", imageRouter.initRoutes(), imageMiddleware.errorProcessing);
 app.use(AUTH_ROUTE, authenticationRouter.initRoutes());
 
-app.listen(PORT, () => {
+server.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 });

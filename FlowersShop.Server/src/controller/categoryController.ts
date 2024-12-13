@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { CategoryRequest } from "../model/dto/request/categoryRequest";
 import { CategoryService } from "../service/impl/categoryService";
+import { Socket } from 'socket.io';
 
 class CategoryController {
     private categoryService: CategoryService;
@@ -18,12 +19,30 @@ class CategoryController {
         }
     };
 
+    public getCategoryByIdSocket = async (socket: Socket, categoryId: string): Promise<void> => {
+        try {
+            const categoryResponse = await this.categoryService.getCategoryById(categoryId);
+            socket.emit("categoryResponse", categoryResponse);
+        } catch (error) {
+            socket.emit("error", { message: `Category not found: ${(error as Error).message}`, error });
+        }
+    };
+
     public getAllCategories = async (_req: Request, res: Response): Promise<void> => {
         try {
             const categoriesResponse = await this.categoryService.getAllCategories();
             res.status(200).json(categoriesResponse);
         } catch (error) {
             res.status(500).json({ message: `Error retrieving categories: ${(error as Error).message}` });
+        }
+    };
+
+    public getAllCategoriesSocket = async (socket: Socket): Promise<void> => {
+        try {
+            const categoriesResponse = await this.categoryService.getAllCategories();
+            socket.emit("categoriesResponse", categoriesResponse);
+        } catch (error) {
+            socket.emit("error", { message: `Error retrieving categories: ${(error as Error).message}`, error });
         }
     };
 

@@ -3,8 +3,11 @@ import { CategoryRequest } from "../../model/dto/request/categoryRequest";
 import { CategoryResponse } from "../../model/dto/response/categoryResponse";
 import { fetchWithTokenRefresh } from "../../utils/serviceUtils";
 import { CategoryMapper } from "../mapper/categoryMapper";
+import { io, Socket } from "socket.io-client";
 
 export class CategoryService {
+    static readonly socket = io("http://localhost:5000");
+
     public static getCategoryById = async (id: string): Promise<Category> => {
         let getCategoryByIdResponse: Response;
         
@@ -40,6 +43,31 @@ export class CategoryService {
 
         return CategoryMapper.toCategories(await getCategoryAllResponse.json());
     }
+
+    public static getAllCategoriesSocket = async (): Promise<Category[]> => {
+        return new Promise((resolve, reject) => {
+            this.socket.emit("getAllCategoriesSocket");
+
+            const handleResponse = (getCategoryAllResponse: any) => {
+                const categories = CategoryMapper.toCategories(getCategoryAllResponse);
+                cleanup();
+                resolve(categories);
+            };
+
+            const handleError = (error: any) => {
+                cleanup();
+                reject(new Error(`Get all categories error: ${error.message}`));
+            };
+
+            const cleanup = () => {
+                this.socket.off("categoriesResponse", handleResponse);
+                this.socket.off("error", handleError);
+            };
+
+            this.socket.on("categoriesResponse", handleResponse);
+            this.socket.on("error", handleError);
+        });
+    };
 
     public static createCategory = async (categoryRequset: CategoryRequest): Promise<Category> => {
         let createCategoryResponse: Response;

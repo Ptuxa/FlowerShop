@@ -2,6 +2,7 @@ import express, { Router } from "express";
 import CategoryController from "../../controller/categoryController";
 import { AuthMiddleware } from "../middleware/authMiddleware";
 import { EnumUserRole } from "../../model/enum/enumUserRole";
+import { Server } from "socket.io";
 
 class CategoryRouter {
     private readonly categoryController: CategoryController;
@@ -14,7 +15,7 @@ class CategoryRouter {
         this.router = express.Router();
     }
 
-    public initRoutes(): Router {
+    public initRoutes(webSocketServerIO: Server): Router {
         this.router.get("/:id", this.categoryController.getCategoryById);
         this.router.get("/", this.categoryController.getAllCategories);
         this.router.post(
@@ -34,7 +35,13 @@ class CategoryRouter {
             this.authMiddleware.authenticate,
             this.authMiddleware.authorize([EnumUserRole.ADMIN]),
             this.categoryController.deleteCategory
-        );
+        ); 
+
+        webSocketServerIO.on("connection", (socket) => {            
+            socket.on("getAllCategoriesSocket", async () => {
+                await this.categoryController.getAllCategoriesSocket(socket);
+            });            
+        });
 
         return this.router;
     }
