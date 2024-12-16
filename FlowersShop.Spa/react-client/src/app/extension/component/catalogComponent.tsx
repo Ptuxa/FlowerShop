@@ -157,35 +157,39 @@ export const CatalogComponent = () => {
 
     return (
         <>
-            <div style={{ display: 'flex', marginBottom: '30px' }}>
-                <div style={{ marginRight: '20px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', gap: '20px', paddingTop: '20px' }}>
+                {/* Левая колонка: категории и кнопка Apply */}
+                <div style={{ flex: '0 0 300px', marginRight: '20px' }}>
                     <Title level={4}>Categories</Title>
                     <Checkbox.Group value={checkedCategoryIds} onChange={handleFilterCategoriesChange}>
-                        <Space direction="vertical">
-                            {
-                                loadingCategories ?
-                                    <Title>Loading...</Title> :
-                                    <div>
-                                        {categories.map((category) => (
-                                            <Checkbox key={category.id} value={category.id}>
-                                                {category.name}
-                                            </Checkbox>
-                                        ))}
-                                    </div>
-                            }
+                        <Space direction="vertical" size="small">
+                            {loadingCategories ? (
+                                <Title>Loading...</Title>
+                            ) : (
+                                categories.map((category) => (
+                                    <Checkbox key={category.id} value={category.id}>
+                                        {category.name}
+                                    </Checkbox>
+                                ))
+                            )}
                         </Space>
                     </Checkbox.Group>
-                    <Button type="primary" style={{ marginTop: '20px' }} onClick={() => filterProductsByCategory(checkedCategoryIds)}>
+                    <Button
+                        type="primary"
+                        style={{ marginTop: '20px', width: '100%' }}
+                        onClick={() => filterProductsByCategory(checkedCategoryIds)}
+                    >
                         Apply
                     </Button>
                 </div>
-                <div>
-                    {
-                        isAuthorized &&
+
+                {/* Правая колонка: карточки продуктов */}
+                <div style={{ flex: '1', display: 'flex', flexDirection: 'column', paddingTop: '20px'}}>
+                    {isAuthorized && (
                         <>
                             <Button
                                 type="primary"
-                                style={{ marginTop: '30px' }}
+                                style={{ marginBottom: '20px', alignSelf: 'flex-end' }}
                                 size="large"
                                 onClick={() => handleButtonAddProductClick()}
                             >
@@ -203,19 +207,25 @@ export const CatalogComponent = () => {
                                 handleCancel={() => handleCloseModal()}
                             />
                         </>
-                    }
+                    )}
 
-                    {
-                        loadingProducts ?
-                            <Title>Loading...</Title> :
-                            <ProductCardsComponent
-                                products={products}
-                                handleUpdate={(product) => handleButtonUpdateProductClick(product)}
-                                handleDelete={(productId) => handleButtonDeleteProductClick(productId)}>
-                            </ProductCardsComponent>
-                    }
+                    {loadingProducts ? (
+                        <Title>Loading...</Title>
+                    ) : (
+                        <ProductCardsComponent
+                            products={products}
+                            handleUpdate={(product) => handleButtonUpdateProductClick(product)}
+                            handleDelete={(productId) => handleButtonDeleteProductClick(productId)}
+                            style={{
+                                display: 'grid',
+                                gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
+                                gap: '20px',
+                            }}
+                        />
+                    )}
                 </div>
             </div>
         </>
+
     );
 };

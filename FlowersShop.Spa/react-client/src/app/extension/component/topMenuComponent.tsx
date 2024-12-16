@@ -25,7 +25,7 @@ export const TopMenuComponent = () => {
     }
 
     const items = [
-        { key: "home", label: <Link href={"/catalog"}>Home</Link> },
+        { key: "home", label: <Link href={"/catalog"}>Catalog</Link> },
         ...(isAuthorized
             ? [{ key: "categories", label: <Link href={"/categories"}>Categories</Link> }]
             : []),

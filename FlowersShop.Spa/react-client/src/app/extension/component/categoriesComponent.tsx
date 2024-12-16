@@ -103,10 +103,10 @@ export const CategoriesComponent = () => {
 
     return (
         <>
-            <div style={{ display: 'flex', marginBottom: '30px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', marginBottom: '30px', paddingTop: '20px'}}>
                 <Button
                     type="primary"
-                    style={{ marginTop: '30px' }}
+                    style={{ marginRight: '20px' }} // Отступ справа от кнопки
                     size="large"
                     onClick={() => handleButotnAddCategoryClick()}
                 >
@@ -121,16 +121,23 @@ export const CategoriesComponent = () => {
                     handleUpdate={(productId, product) => handleUpdateCategory(productId, product)}
                     handleCancel={() => handleCloseModal()}
                 />
-                {
-                    loadingCategories ?
-                        <Title>Loading...</Title> :
-                        <CategoryCardsComponent
-                            categories={categories}
-                            handleUpdate={(category) => handleButtonUpdateCategoryClick(category)}
-                            handleDelete={(categoryId) => handleButtonDeleteCategoryClick(categoryId)}>
-                        </CategoryCardsComponent>
-                }
             </div>
+
+            {loadingCategories ? (
+                <Title>Loading...</Title>
+            ) : (
+                <CategoryCardsComponent
+                    categories={categories}
+                    handleUpdate={(category) => handleButtonUpdateCategoryClick(category)}
+                    handleDelete={(categoryId) => handleButtonDeleteCategoryClick(categoryId)}
+                    style={{
+                        display: "grid",
+                        gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", // Сетка для карточек
+                        gap: "20px",
+                    }}
+                />
+            )}
         </>
+
     )
 }
