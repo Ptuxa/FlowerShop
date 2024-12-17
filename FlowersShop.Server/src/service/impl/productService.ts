@@ -1,6 +1,7 @@
 import { ProductRequest } from "../../model/dto/request/productRequest";
 import { ProductsByCategoryIdsRequest } from "../../model/dto/request/productsCategoryIdsRequest";
 import { ProductResponse } from "../../model/dto/response/productResponse";
+import { Category } from "../../model/entity/category";
 import { Product } from "../../model/entity/product";
 import { ProductRepository } from "../../repository/productRepository";
 import { ProductMapper } from "../mapper/productMapper";
@@ -48,6 +49,18 @@ export class ProductService {
         }
 
         return this.productMapper.toProductResponseList(products);
+    }
+
+    public async getAllProductsByCategoryIdsGraphQl(categoriesIds: string[]): Promise<Product[]> {
+        let products: Product[] | null;
+
+        try {
+            products = await this.productRepository.getAllByCategoryIds(categoriesIds);
+        } catch (error) {
+            throw new Error("Error in ProductService getAllCategories: " + error);
+        }
+
+        return products;
     }
 
     public async createProduct(productRequest: ProductRequest): Promise<ProductResponse> {

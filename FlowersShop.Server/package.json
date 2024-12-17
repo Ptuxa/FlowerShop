@@ -10,14 +10,17 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "description": "",
   "dependencies": {
+    "@apollo/server": "^4.11.2",
+    "@types/express": "^4.17.21",
     "bcryptjs": "^2.4.3",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
-    "express": "^4.21.1",
+    "express": "^4.21.2",
     "express-validator": "^7.2.0",
+    "graphql": "^16.10.0",
+    "graphql-tag": "^2.12.6",
     "ioredis": "^5.4.1",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.7.0",
@@ -31,14 +34,13 @@
     "@types/bcryptjs": "^2.4.6",
     "@types/cookie-parser": "^1.4.8",
     "@types/cors": "^2.8.17",
-    "@types/express": "^5.0.0",
     "@types/jsonwebtoken": "^9.0.7",
-    "@types/mongoose": "^5.11.97",
     "@types/multer": "^1.4.12",
     "@types/node": "^22.7.4",
     "@types/uuid": "^10.0.0",
     "nodemon": "^3.1.7",
     "ts-node": "^10.9.2",
     "typescript": "^5.6.2"
-  }
+  },
+  "description": ""
 }

@@ -30,6 +30,7 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import { Server } from "socket.io";
 import http from "http";
+import ApolloServerRoute from "./configuration/routes/apolloServerRoute";
 
 declare global {
     namespace Express {
@@ -84,35 +85,43 @@ const categoryRouter = new CategoryRouter(categoryController, authMiddleware);
 const productRouter = new ProductRouter(productController, authMiddleware);
 const imageRouter = new ImageRouter(imageController, authMiddleware, imageMiddleware);
 const authenticationRouter = new AuthenticationRouter(authenticationController, authMiddleware);
+const apolloServerRoute = new ApolloServerRoute(productService);
 
-const app = express();
-const server = http.createServer(app);
-const webSocketServerIO = new Server(server,{
-    cors: {
-        origin: ALLOWED_ORIGINS,
-        credentials: true 
-    }
-});
-app.use(express.json());
 
-app.use(cookieParser());
+(async () => {
+    const app = express();
+    const server = http.createServer(app);
+    const webSocketServerIO = new Server(server, {
+        cors: {
+            origin: ALLOWED_ORIGINS,
+            credentials: true,
+        },
+    });
 
-app.use(cors({  
-    origin: (origin, callback) => {
-        if (!origin || ALLOWED_ORIGINS.includes(origin)) {
-            callback(null, true);
-        } else {
-            callback(new Error("Not allowed by CORS"));
-        }
-    },
-    credentials: true
-}));
+    app.use(express.json());
+    app.use(cookieParser());
+    app.use(
+        cors({
+            origin: (origin, callback) => {
+                if (!origin || ALLOWED_ORIGINS.includes(origin)) {
+                    callback(null, true);
+                } else {
+                    callback(new Error('Not allowed by CORS'));
+                }
+            },
+            credentials: true,
+        })
+    );
 
-app.use("/api/category", categoryRouter.initRoutes(webSocketServerIO));
-app.use("/api/product", productRouter.initRoutes());
-app.use("/api/image", imageRouter.initRoutes(), imageMiddleware.errorProcessing);
-app.use(AUTH_ROUTE, authenticationRouter.initRoutes());
+    const apolloServerRoute = new ApolloServerRoute(productService);
+    await apolloServerRoute.initRoutes(app);
 
-server.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
-});
+    app.use('/api/category', categoryRouter.initRoutes(webSocketServerIO));
+    app.use('/api/product', productRouter.initRoutes());
+    app.use('/api/image', imageRouter.initRoutes(), imageMiddleware.errorProcessing);
+    app.use('/api/auth', authenticationRouter.initRoutes());
+
+    server.listen(PORT, () => {
+        console.log(`Server is running on port ${PORT}`);
+    });
+})();
