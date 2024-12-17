@@ -12,6 +12,9 @@ import { CreateUpdateProductModal } from "./createUpdateProductModal";
 import { ProductRequest } from "../model/dto/request/productRequest";
 import { ProductCardsComponent } from "./productCardsComponent";
 import { useAuth } from "../context/authContext";
+import { ApolloClient, ApolloProvider, InMemoryCache, useQuery } from "@apollo/client";
+import { GET_ALL_PRODUCTS_BY_CATEGORY } from "../services/graphQl/getAllProductsByCategory";
+import { useApolloClient } from '@apollo/client';
 
 const { Title } = Typography;
 
@@ -26,6 +29,13 @@ export const CatalogComponent = () => {
         categoryId: null,
         imageName: null
     }
+
+    // const client = useApolloClient();
+
+    const client = new ApolloClient({
+        uri: 'http://localhost:5000/graphql', // укажите свой URL GraphQL сервера
+        cache: new InMemoryCache(),
+    });
 
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [operationType, setOperationType] = useState(OperationType.Create);
@@ -72,20 +82,23 @@ export const CatalogComponent = () => {
     };
 
     const filterProductsByCategory = async (filterCategoryIds: string[]) => {
+        let data: any | null;
         setLoadingProducts(true);
 
-        let products: Product[];
-
         try {
-            products = await ProductService.getAllProductsByCategoryIds(ProductMapper.toProductsByCategoryIdsRequest(filterCategoryIds));
+            const response = await client.query({
+                query: GET_ALL_PRODUCTS_BY_CATEGORY,
+                variables: { categoriesIds: filterCategoryIds },
+            });
+
+            setProducts(response.data.getAllProductsByCategoryIdsGraphQl); // Обновление состояния
         } catch (error) {
-            throw error;
+            console.error("Error fetching products:", error);
         } finally {
             setLoadingProducts(false);
         }
+    }
 
-        setProducts(products);
-    };
 
     useEffect(() => {
         loadAllCategories();
@@ -157,7 +170,7 @@ export const CatalogComponent = () => {
 
     return (
         <>
-            <div style={{ display: 'flex', justifyContent: 'space-between', gap: '20px', paddingTop: '20px' }}>
+            <ApolloProvider client={client}><div style={{ display: 'flex', justifyContent: 'space-between', gap: '20px', paddingTop: '20px' }}>
                 {/* Левая колонка: категории и кнопка Apply */}
                 <div style={{ flex: '0 0 300px', marginRight: '20px' }}>
                     <Title level={4}>Categories</Title>
@@ -184,7 +197,7 @@ export const CatalogComponent = () => {
                 </div>
 
                 {/* Правая колонка: карточки продуктов */}
-                <div style={{ flex: '1', display: 'flex', flexDirection: 'column', paddingTop: '20px'}}>
+                <div style={{ flex: '1', display: 'flex', flexDirection: 'column', paddingTop: '20px' }}>
                     {isAuthorized && (
                         <>
                             <Button
@@ -224,7 +237,8 @@ export const CatalogComponent = () => {
                         />
                     )}
                 </div>
-            </div>
+            </div></ApolloProvider>
+
         </>
 
     );

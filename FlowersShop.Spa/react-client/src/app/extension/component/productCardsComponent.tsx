@@ -7,8 +7,12 @@ import { CardTitleComponent } from "./cardTitleComponent"
 import Button from "antd/es/button/button"
 import { ImageService } from "../services/impl/imageService";
 import { useAuth } from "../context/authContext";
+import { GET_ALL_PRODUCTS_BY_CATEGORY } from "../services/graphQl/getAllProductsByCategory";
+import { useQuery } from "@apollo/client";
 
 export const ProductCardsComponent = ({ products, handleUpdate, handleDelete, style }: ProductCardsProps & { style?: React.CSSProperties }) => {
+    
+    
     const { isAuthorized } = useAuth();
 
     return (
